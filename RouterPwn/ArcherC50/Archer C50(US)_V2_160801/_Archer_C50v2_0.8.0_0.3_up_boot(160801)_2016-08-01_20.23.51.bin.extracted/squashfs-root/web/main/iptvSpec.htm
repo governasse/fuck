@@ -1,0 +1,1134 @@
+﻿<style type="text/css">
+div.line-margin {
+    margin-left: 35px;
+}
+.pure-form-aligned .pure-control-group label.label-title.disabled {
+    color:#b3b3b3;
+}
+
+.disabled .select-box {
+    border: 1px solid #e6e6e6;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 1;
+    color: #b3b3b3;
+}
+.disabled .select-icon-container, .disabled .select-icon {
+    border: 0 none;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.disabled .select-box:hover {
+    border: 1px solid #e6e6e6;
+    color: #b3b3b3;
+}
+.select-title.disabled .label-title {
+    color: #b3b3b3;
+}
+
+.pure-form input[type="text"][disabled].tp-input-text {
+    color: #b3b3b3;
+    background-color: #ffffff;
+}
+
+</style>
+<script language="javascript" type="text/javascript">
+var default_mode_data = {};
+default_mode_data = {
+    "noIptv": {
+        "vlan": {
+            "internet": {
+                "enable": true,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 1
+            },
+            "iptv": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "ipphone": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "multicast": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            }
+        },
+        "lan_mode": ['internet', 'internet', 'internet', 'internet'],
+        "view": {
+            "internetDisplay": false,
+            "ipphoneDisplay": false,
+            "iptvDisplay": false,
+            "multicastDisplay": false,
+            "vlanIdDisable": true,
+            "priorityDisable": true,
+            "internetTagDisable": true,
+            "lanDisable": true,
+            "ipphoneOptionShow": false
+        }
+    },
+    "bridge": {
+        "vlan": {
+            "internet": {
+                "enable": true,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 1,
+                "untag": 1
+            },
+            "iptv": {
+                "enable": true,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 2,
+                "untag": 1
+            },
+            "ipphone": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "multicast": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            }
+        },
+        "lan_mode": ['internet', 'internet', 'iptv', 'iptv'],
+        "view": {
+            "internetDisplay": false,
+            "ipphoneDisplay": false,
+            "iptvDisplay": false,
+            "multicastDisplay": false,
+            "vlanIdDisable": false,
+            "priorityDisable": false,
+            "internetTagDisable": false,
+            "lanDisable": false,
+            "ipphoneOptionShow": false
+        }
+    },
+    "russia": {
+        "vlan": {
+            "internet": {
+                "enable": true,
+                "vlanID": 1257,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "iptv": {
+                "enable": true,
+                "vlanID": 4000,
+                "priority": 4,
+                "extendID": 0,
+                "untag": 0
+            },
+            "ipphone": {
+                "enable": true,
+                "vlanID": 263,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "multicast": {
+                "enable": false,
+                "vlanID": 1110,
+                "priority": 4,
+                "extendID": 0,
+                "untag": 0
+            }
+        },
+        "lan_mode": ['ipphone', 'internet', 'internet', 'iptv'],
+        "view": {
+            "internetDisplay": true,
+            "ipphoneDisplay": true,
+            "iptvDisplay": true,
+            "multicastDisplay": true,
+            "vlanIdDisable": true,
+            "priorityDisable": true,
+            "internetTagDisable": true,
+            "lanDisable": true,
+            "ipphoneOptionShow": true
+        }
+    },
+    "exstream": {
+        "vlan": {
+            "internet": {
+                "enable": true,
+                "vlanID": 10,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "iptv": {
+                "enable": true,
+                "vlanID": 20,
+                "priority": 4,
+                "extendID": 0,
+                "untag": 0
+            },
+            "ipphone": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "multicast": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            }
+        },
+        "lan_mode": ['internet', 'internet', 'internet', 'iptv'],
+        "view": {
+            "internetDisplay": true,
+            "ipphoneDisplay": false,
+            "iptvDisplay": true,
+            "multicastDisplay": false,
+            "vlanIdDisable": true,
+            "priorityDisable": true,
+            "internetTagDisable": true,
+            "lanDisable": true,
+            "ipphoneOptionShow": true
+        }
+    },
+    "unifi": {
+        "vlan": {
+            "internet": {
+                "enable": true,
+                "vlanID": 500,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "iptv": {
+                "enable": true,
+                "vlanID": 600,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "ipphone": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "multicast": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            }
+        },
+        "lan_mode": ['iptv', 'internet', 'internet', 'internet'],
+        "view": {
+            "internetDisplay": true,
+            "ipphoneDisplay": false,
+            "iptvDisplay": true,
+            "multicastDisplay": false,
+            "vlanIdDisable": true,
+            "priorityDisable": true,
+            "internetTagDisable": true,
+            "lanDisable": true,
+            "ipphoneOptionShow": true
+        }
+    },
+    "maxis": {
+        "vlan": {
+            "internet": {
+                "enable": true,
+                "vlanID": 621,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "iptv": {
+                "enable": true,
+                "vlanID": 823,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "ipphone": {
+                "enable": true,
+                "vlanID": 821,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "multicast": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            }
+        },
+        "lan_mode": ['iptv', 'internet', 'internet', 'ipphone'],
+        "view": {
+            "internetDisplay": true,
+            "ipphoneDisplay": true,
+            "iptvDisplay": true,
+            "multicastDisplay": false,
+            "vlanIdDisable": true,
+            "priorityDisable": false,
+            "internetTagDisable": true,
+            "lanDisable": true,
+            "ipphoneOptionShow": true
+        }
+    },
+    "custom": {
+        "vlan": {
+            "internet": {
+                "enable": true,
+                "name": "internet",
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "iptv": {
+                "enable": true,
+                "name": "iptv",
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "ipphone": {
+                "enable": true,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            },
+            "multicast": {
+                "enable": false,
+                "vlanID": 0,
+                "priority": 0,
+                "extendID": 0,
+                "untag": 0
+            }
+        },
+        "lan_mode": ['internet', 'internet', 'internet', 'internet'],
+        "view": {
+            "internetDisplay": true,
+            "ipphoneDisplay": true,
+            "iptvDisplay": true,
+            "multicastDisplay": true,
+            "vlanIdDisable": false,
+            "priorityDisable": false,
+            "internetTagDisable": false,
+            "lanDisable": false,
+            "ipphoneOptionShow": true
+        }
+    }
+}
+
+function init() {
+    initVlanData();
+    if (INCLUDE_IGMP_FORCEVERSION){
+        $("#igmp_proxy_version").removeClass("nd");
+        loadIgmpCfg();   
+    }
+}
+
+function initVlanData() {
+    var vlan = $.act(ACT_GET, VLAN, null, null);
+    var ispService = $.act(ACT_GL, ISP_SERVICE, null, null);
+    var showMode = "bridge";
+    $.exe(function(err) {
+        if (err) {
+            return
+        }
+
+        /* init Data to initObj */
+        showMode = vlan.workingMode;
+        if (showMode == "" || showMode == null)
+        {
+            showMode = "noIptv";
+        }
+
+        if (showMode == "noIptv") {
+            $("#iptven").prop("checked", false);
+            $("#iptv_mode option[value='bridge']").prop("selected", "selected");
+            showDataToPage(default_mode_data["bridge"]);
+        } else {
+            $("#iptven").prop("checked", true);
+            $("#iptv_mode option[value='" + showMode + "']").prop("selected", "selected");
+            var dmData = {};
+            jQuery.extend(dmData, default_mode_data[showMode]);
+            copyDmToData(dmData, vlan, ispService);
+   
+            showDataToPage(dmData);
+            if (showMode == "custom") {
+                default_mode_data["custom"] = dmData;
+            }
+        }
+
+        $("#iptven").data("tpCheckbox").refresh();
+        $("#iptv_mode").tpSelect({
+            refresh: 1
+        });
+    });
+}
+
+
+function copyDmToData(data, internet, ispService) {
+    var iptv, ipphone, multicast;
+    for (item in ispService) {
+        if (ispService[item].name == "iptv") {
+            iptv = ispService[item];
+        } else if (ispService[item].name == "ipphone") {
+            ipphone = ispService[item];
+        } else if (ispService[item].name == "multicast") {
+            multicast = ispService[item];
+        }
+    }
+
+    if (data.view.vlanIdDisable == false) {
+        data.vlan.internet.vlanID = internet.internetGroupVlanID;
+        data.vlan.iptv.vlanID = iptv.vlanID;
+        data.vlan.ipphone.vlanID = ipphone.vlanID;
+    }
+
+    if (data.view.priorityDisable == false) {
+        data.vlan.internet.priority = internet.internetGroupPriority;
+        data.vlan.iptv.priority = iptv.priority;
+        data.vlan.ipphone.priority = ipphone.priority;
+    }
+
+    if (data.view.internetTagDisable == false) {
+        data.vlan.internet.untag = internet.internetUntag;
+    }
+
+    if (multicast.priority != 0){
+        data.vlan.multicast.priority = multicast.priority;
+    }
+
+    data.vlan.multicast.enable = multicast.enable;
+    data.vlan.multicast.vlanID = multicast.vlanID;
+    data.vlan.multicast.priority = multicast.priority;
+
+    if (data.view.lanDisable == false) {
+        var lanPortArray;
+        lanPortArray = getVlanPort(internet.internetGroupLanPort);
+        for (var i = 0; i < 4; i++) {
+            if (lanPortArray[i] == 1) {
+                data.lan_mode[i] = "internet";
+            }
+        }
+
+        lanPortArray = getVlanPort(iptv.lanPort);
+        for (var i = 0; i < 4; i++) {
+            if (lanPortArray[i] == 1) {
+                data.lan_mode[i] = "iptv";
+            }
+        }
+
+        lanPortArray = getVlanPort(ipphone.lanPort);
+        for (var i = 0; i < 4; i++) {
+            if (lanPortArray[i] == 1) {
+                data.lan_mode[i] = "ipphone";
+            }
+        }
+    }
+}
+
+/* 按照各个端口的权重来区分设置采用了那些端口，lan1、lan2、lan3、lan4对应的权重为1,2,4,8 */
+
+function getVlanPort(lanPort) {
+    var lanArray = new Array(0, 0, 0, 0);
+    var count = 0;
+    var calPort = lanPort;
+
+    while (calPort) {
+        if (calPort % 2 == 1) {
+            lanArray[count] = 1;
+        }
+        calPort = Math.floor(calPort / 2);
+        count++;
+    }
+    return lanArray;
+}
+
+function showDataToPage(modeObj) {
+    if (modeObj == null)
+        return;
+    /* set vlan data */
+    $.each(modeObj.vlan, function(vitem) {
+        $("#vid_" + vitem).prop("value", this.vlanID);
+        $("#prio_" + vitem + " option[value='" + this.priority + "']").prop("selected", "selected");
+
+        if (vitem == "internet") {
+            $("#enable_tag_internet").prop("checked", (this.untag == 1 ? false : true));
+        }
+
+        if (vitem == "multicast") {
+            $("#enable_multicast").prop("checked", (this.enable == 1 ? true : false));
+        }
+    });
+
+
+    /* set lan mode */
+    for (var index = 0; index < 4; index++) {
+        $("#mode_lan" + (index + 1) + " option[value='" + modeObj.lan_mode[index] + "']").prop("selected", "selected");
+
+    }
+
+    /* set vlan view */
+    var ispNameArr = ["internet", "iptv", "ipphone", "multicast"];
+    for (var index = 0; index < ispNameArr.length; index++) {
+        if (modeObj.view[ispNameArr[index] + "Display"] == true) {
+            $("#vlan_" + ispNameArr[index]).removeClass("nd");
+        } else {
+            $("#vlan_" + ispNameArr[index]).addClass("nd");
+        }
+
+        if (modeObj.view.vlanIdDisable == true) {
+            $("#vid_" + ispNameArr[index]).prop("disabled", true);
+            $("#vid_" + ispNameArr[index]).prev().addClass("disabled");
+        } else {
+            $("#vid_" + ispNameArr[index]).prop("disabled", false);
+            $("#vid_" + ispNameArr[index]).prev().removeClass("disabled");
+        }
+
+        if (modeObj.view.priorityDisable == true) {
+            $("#t_prio_" + ispNameArr[index]).addClass("disabled");
+            $("#prio_" + ispNameArr[index]).prop("disabled", true);
+            $("#prio_" + ispNameArr[index]).tpSelect({
+                refresh: 1
+            });
+        } else {
+            $("#t_prio_" + ispNameArr[index]).removeClass("disabled");
+            $("#prio_" + ispNameArr[index]).prop("disabled", false);
+            $("#prio_" + ispNameArr[index]).tpSelect({
+                refresh: 1
+            });
+        }
+    }
+
+    $("#enable_tag_internet").prop("disabled", modeObj.view.internetTagDisable);
+    $("#enable_tag_internet").data('tpCheckbox').refresh();
+    $("#enable_multicast").data('tpCheckbox').refresh();
+    refresh_multicast_checkbox();
+
+    /* set lan View */
+    for (var index = 1; index <= 4; index++) {
+        if (modeObj.view.lanDisable == true) {
+            $("#t_lan" + index).addClass("disabled");
+        } else {
+            $("#t_lan" + index).removeClass("disabled");
+        }
+
+        if (modeObj.view.ipphoneOptionShow == true) {
+            $("#mode_lan" + index + " option[value='ipphone']").removeClass("nd");
+        } else {
+            $("#mode_lan" + index + " option[value='ipphone']").addClass("nd");
+        }
+
+        $("#mode_lan" + index).prop("disabled", modeObj.view.lanDisable);
+        $("#mode_lan" + index).tpSelect({
+            refresh: 1
+        });
+    }
+}
+
+function showMode() {
+    var mode = $("#iptv_mode").data("value");
+    showDataToPage(default_mode_data[mode]);
+}
+
+function checkDataValid() {
+    var showMode = $("#iptv_mode").data("value");
+    var checkView = default_mode_data[showMode].view;
+
+    var vid_internet = $("#vid_internet").prop("value");
+    var vid_iptv = $("#vid_iptv").prop("value");
+    var vid_ipphone = $("#vid_ipphone").prop("value");
+    var vid_multicast = $("#vid_multicast").prop("value");
+    var enable_multicast = $("#enable_multicast").prop("data-checked");
+
+    /* check vlan ID valid */
+    if (checkView.internetDisplay == true && $.num(vid_internet, [1, 4094], true)) {
+        $("#vid_internet").focus().select();
+        $.alert(ERR_VLAN_INVALID_VLANID);
+        return false;
+    }
+
+    if (checkView.iptvDisplay == true && $.num(vid_iptv, [1, 4094], true)) {
+        $("#vid_iptv").focus().select();
+        $.alert(ERR_VLAN_INVALID_VLANID);
+        return false;
+    }
+
+    if (checkView.ipphoneDisplay == true && $.num(vid_ipphone, [1, 4094], true)) {
+        $("#vid_ipphone").focus().select();
+        $.alert(ERR_VLAN_INVALID_VLANID);
+        return false;
+    }
+
+    if (checkView.multicastDisplay == true && enable_multicast && $.num(vid_multicast, [1, 4094], true)) {
+        $("#vid_multicast").focus().select();
+        $.alert(ERR_VLAN_INVALID_VLANID);
+        return false;
+    }
+
+    /* change type, check such "12" == "012" error */
+    vid_internet = parseInt(vid_internet);
+    vid_iptv = parseInt(vid_iptv);
+    vid_ipphone = parseInt(vid_ipphone);
+    vid_multicast = parseInt(vid_multicast);
+
+
+    /* check vlan ID same */
+    if (checkView.internetDisplay == true && checkView.iptvDisplay == true && vid_internet == vid_iptv) {
+        $("#vid_internet").focus().select();
+        $.alert(ERR_VLAN_SAME_VLANID);
+        return false;
+    }
+
+    if (checkView.internetDisplay == true && checkView.iptvDisplay == true && vid_internet == vid_ipphone) {
+        $("#vid_internet").focus().select();
+        $.alert(ERR_VLAN_SAME_VLANID);
+        return false;
+    }
+
+    if (checkView.iptvDisplay == true && checkView.ipphoneDisplay == true && vid_iptv == vid_ipphone) {
+        $("#vid_iptv").focus().select();
+        $.alert(ERR_VLAN_SAME_VLANID);
+        return false;
+    }
+
+    if (enable_multicast == true && checkView.multicastDisplay == true) {
+        if (vid_multicast == vid_internet || vid_multicast == vid_iptv || vid_multicast == vid_ipphone) {
+            $("#vid_multicast").focus().select();
+            $.alert(ERR_VLAN_SAME_VLANID);
+            return false;
+        }
+    }
+
+    /* check internet lan port */
+    var hasInternet = false;
+    for (i = 1; i <= 4; i++) {
+        if ($("#mode_lan" + i).data("value") == "internet") {
+            hasInternet = true;
+        }
+    }
+
+    if (hasInternet == false) {
+        $.alert(ERR_VLAN_NO_INTERNET_GROUP);
+        return false;
+    }
+
+    return true;
+}
+
+function copyPageVlanToData() {
+    var showMode = $("#iptv_mode").data("value");
+
+    var iptvEnable = $("#iptven").prop("data-checked");
+
+    if (iptvEnable == false) {
+        showMode = "noIptv";
+        return default_mode_data["noIptv"];
+    }
+
+    var returnModeData = {};
+    jQuery.extend(returnModeData, default_mode_data[showMode]);
+
+    if (returnModeData.view.vlanIdDisable == false) {
+        returnModeData.vlan.internet.vlanID = parseInt($("#vid_internet").prop("value"));
+        returnModeData.vlan.iptv.vlanID = parseInt($("#vid_iptv").prop("value"));
+        returnModeData.vlan.ipphone.vlanID = parseInt($("#vid_ipphone").prop("value"));
+    }
+
+    if (returnModeData.view.priorityDisable == false) {
+        returnModeData.vlan.internet.priority = $("#prio_internet").data("value");
+        returnModeData.vlan.iptv.priority = $("#prio_iptv").data("value");
+        returnModeData.vlan.ipphone.priority = $("#prio_ipphone").data("value");
+    }
+
+    returnModeData.vlan.internet.untag = ($("#enable_tag_internet").prop("data-checked") ? 0 : 1);
+
+    /* for multicast */
+    returnModeData.vlan.multicast.enable = $("#enable_multicast").prop("data-checked");
+    returnModeData.vlan.multicast.vlanID = parseInt($("#vid_multicast").prop("value"));
+    returnModeData.vlan.multicast.priority = $("#prio_multicast").data("value");
+
+    /* if multicast disable and multicast vlanID invalid,set vlanID to zero */
+    if (returnModeData.vlan.multicast.enable == false && 
+        (returnModeData.vlan.multicast.vlanID < 1 || returnModeData.vlan.multicast.vlanID > 4094)){
+        returnModeData.vlan.multicast.vlanID = 0;
+    }
+
+    /* for lan settings */
+    for (i = 1; i <= 4; i++) {
+        returnModeData.lan_mode[i - 1] = $("#mode_lan" + i).data("value");
+    }
+
+    return returnModeData;
+}
+
+function transToSaveData(trans) {
+    /* calc lan Port*/
+    var power = 1;
+    var iptvLanPort = 0;
+    var ipphoneLanPort = 0;
+    var internetLanPort = 0;
+    for (var i = 1; i <= 4; i++) {
+        if (trans.lan_mode[i - 1] == "internet") {
+            internetLanPort += power;
+        } else if (trans.lan_mode[i - 1] == "ipphone") {
+            ipphoneLanPort += power;
+        } else if (trans.lan_mode[i - 1] == "iptv") {
+            iptvLanPort += power;
+        }
+        power = power * 2;
+    }
+
+    /* Internet */
+    var showMode = $("#iptv_mode").data("value");
+    var iptvEnable = $("#iptven").prop("data-checked");
+    if (iptvEnable == false) {
+        showMode = "noIptv";
+    }
+
+    trans.internetGroup = {};
+    trans.internetGroup.internetGroupVlanID = trans.vlan.internet.vlanID;
+    trans.internetGroup.internetGroupPriority = trans.vlan.internet.priority;
+    trans.internetGroup.internetGroupExtendID = trans.vlan.internet.extendID;
+    trans.internetGroup.internetUntag = trans.vlan.internet.untag;
+    trans.internetGroup.internetGroupLanPort = 255 - iptvLanPort - ipphoneLanPort;
+    trans.internetGroup.workingMode = showMode;
+
+    /* vlan */
+    trans.vlan.iptv.lanPort = iptvLanPort;
+    trans.vlan.ipphone.lanPort = ipphoneLanPort;
+    trans.vlan.multicast.lanPort = iptvLanPort;
+
+    trans.vlan.iptv.enable = trans.vlan.iptv.enable ? 1 : 0;
+    trans.vlan.ipphone.enable = trans.vlan.ipphone.enable ? 1 : 0;
+    trans.vlan.multicast.enable = trans.vlan.multicast.enable ? 1 : 0;
+
+}
+
+function doSave() {
+    if (false == checkDataValid()) {
+        return;
+    }
+
+    $.addLoading($("#b_save"));
+    
+    var transData = copyPageVlanToData();
+    transToSaveData(transData);
+
+    /* set vlan data to dm and reboot */
+    var vlan = $.act(ACT_GET, VLAN, null, null);
+    var ispService = $.act(ACT_GL, ISP_SERVICE, null, null);
+    var iptv;
+    var ipphone;
+    var multicast;
+    var needRoot;
+
+    $.exe(function(ret){
+        if (ret) return ;
+        $.each(ispService, function() {
+            if (this.name == "iptv") {
+                iptv = this;
+            } else if (this.name == "ipphone") {
+                ipphone = this;
+            } else if (this.name == "multicast") {
+                multicast = this;
+            }
+        });
+
+        needRoot = checkNeedReboot(transData, vlan, ispService);
+
+        if (needRoot == true) {
+            $.confirm(c_str.save_reboot, function() {
+                if (INCLUDE_IGMP_FORCEVERSION){
+                        setIgmpCfg();
+                }
+                $.act(ACT_SET, VLAN, vlan.__stack, null, transData.internetGroup);
+                $.act(ACT_SET, ISP_SERVICE, iptv.__stack, null, transData.vlan.iptv);
+                $.act(ACT_SET, ISP_SERVICE, ipphone.__stack, null, transData.vlan.ipphone);
+                $.act(ACT_SET, ISP_SERVICE, multicast.__stack, null, transData.vlan.multicast);
+
+                $.exe(function(ret) {
+                    if (ret) return;
+                    $.removeLoading();
+                    $.guage(["<span class='T T_rebooting'>" + s_str.rebooting + "</span>", "<span class='T T_wait_reboot'>" + s_str.wait_reboot + "</span>", ], 100, $.guageInterval, function() {
+                        $.refresh();
+                    });
+
+                    $.act(ACT_OP, ACT_OP_REBOOT);
+                    $.exe(true);
+                });
+            });
+        } else {
+            if (INCLUDE_IGMP_FORCEVERSION){
+                setIgmpCfg();
+            }
+            
+            $.removeLoading();
+            $.reload();
+        }
+    });
+}
+
+function checkNeedReboot(data, internet, ispService) {
+    /* check internet change */
+    if (isElementDiff(data.internetGroup, internet)){
+        return true;
+    }
+
+    for(i in ispService){
+        if (ispService[i].name == "iptv"){
+            if (isElementDiff(data.vlan.iptv, ispService[i])){
+                return true;
+            }
+        } else if (ispService[i].name == "ipphone"){
+            if (isElementDiff(data.vlan.ipphone, ispService[i])){
+                return true;
+            }
+        } else if (ispService[i].name = "multicast"){
+            if (isElementDiff(data.vlan.multicast, ispService[i])){
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+function isElementDiff(compare, source){
+    for(i in compare){
+        if (typeof(source[i]) == undefined){
+            return true;
+        }
+
+        if (compare[i]  != source[i]){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function loadIgmpCfg() {
+    /* because igmp proxy for every wan, we get only for check igmp proxy status */
+    var wanCommIntf = $.act(ACT_GL, WAN_COMMON_INTF_CFG, null, null, null);
+    var wanIPv4ListAll = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable", "addressingType", "X_TP_IPv4Enabled", "X_TP_IGMPProxyEnabled", "X_TP_IGMPForceVersion"]);
+
+    var wanIPList = {};
+    var wanIndex = 0;
+
+    if (!$.exe()) {
+        var wanCommIntfStk; 
+        $.each(wanCommIntf, function(){
+            if (this.WANAccessType == "Ethernet"){
+                wanCommIntfStk = this.__stack;
+            }
+        });
+           
+        $.each(wanIPv4ListAll, function() {
+            var tmpStk = $.stkPop(this.__stack, 2);
+            if (wanCommIntfStk == tmpStk && this.X_TP_IPv4Enabled == 1) {
+                wanIPList[wanIndex] = this;
+                wanIndex++;
+            }
+        });
+    }
+
+    var igmpState = wanIPList[0].X_TP_IGMPProxyEnabled;
+    var version = wanIPList[0].X_TP_IGMPForceVersion;
+
+    /* refresh page view */
+    if (version == 2){
+        $("#igmp_version option[value='v2']").prop("selected", "selected");
+    } else if (version == 0) {
+        $("#igmp_version option[value='v3']").prop("selected", "selected");
+    }
+    $("#igmp_version").tpSelect({refresh:1});
+}
+
+
+function setIgmpCfg() {
+    var version = $("#igmp_version").data("value");
+    var igmp_version = 0;
+    if (version == "v2"){
+        igmp_version = 2;
+    } else if (version == "v3"){
+        igmp_version = 0;
+    }
+
+    /* set all WAN connection IGMP status */
+    var wanCommIntf = $.act(ACT_GL, WAN_COMMON_INTF_CFG, null, null, null);
+    var wanIPListAll = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable", "X_TP_IPv4Enabled","X_TP_IGMPProxyEnabled", "X_TP_IGMPForceVersion"]);
+    var wanPPPListAll = $.act(ACT_GL, WAN_PPP_CONN, null, null, ["enable", "X_TP_IPv4Enabled", "X_TP_IGMPProxyEnabled", "X_TP_IGMPForceVersion"]);
+    var wanL2tpList = $.act(ACT_GL, WAN_L2TP_CONN, null, null, ["enable", "IGMPProxyEnabled", "IGMPForceVersion"]);
+    var wanPptpList = $.act(ACT_GL, WAN_PPTP_CONN, null, null, ["enable", "IGMPProxyEnabled", "IGMPForceVersion"]);
+
+    if (!$.exe()) {
+        var wanCommIntfStk; 
+        $.each(wanCommIntf, function(){
+            if (this.WANAccessType == "Ethernet"){
+                wanCommIntfStk = this.__stack;
+            }
+        });   
+
+        /* wanIpConnection */
+        $.each(wanIPListAll, function() {
+            var tmpStk = $.stkPop(this.__stack, 2);
+            if (wanCommIntfStk == tmpStk && this.X_TP_IPv4Enabled == 1) {
+                $.act(ACT_SET, WAN_IP_CONN, this.__stack, null, ["X_TP_IGMPForceVersion=" + igmp_version]);
+            }
+        });
+
+        /* wanPPPConnection */
+        $.each(wanPPPListAll, function() {
+            var tmpStk = $.stkPop(this.__stack, 2);
+            if (wanCommIntfStk == tmpStk && this.X_TP_IPv4Enabled == 1) {
+                $.act(ACT_SET, WAN_PPP_CONN, this.__stack, null, ["X_TP_IGMPForceVersion=" + igmp_version]);
+            }
+        });
+
+        /* L2TP */
+        $.each(wanL2tpList, function() {
+            var tmpStk = $.stkPop(this.__stack, 1);
+            if (wanCommIntfStk == tmpStk){
+               $.act(ACT_SET, WAN_L2TP_CONN, this.__stack, null, ["IGMPForceVersion=" + igmp_version]); 
+            }
+        });
+
+        /* PPTP */
+        $.each(wanPptpList, function() {
+            var tmpStk = $.stkPop(this.__stack, 1);
+            if (wanCommIntfStk == tmpStk){
+                $.act(ACT_SET, WAN_PPTP_CONN, this.__stack, null, ["IGMPForceVersion=" + igmp_version]);
+            }
+        });
+
+        if (!$.exe()) {
+            /* set succcess, nothing to do */
+        }
+    }
+}
+
+function refresh_multicast_checkbox() {
+    var isEnable = $("#enable_multicast").prop("data-checked");
+
+    if (isEnable) {
+        $("#vid_multicast").prop("disabled", false);
+        $("#vid_multicast").prev().removeClass("disabled");
+        $("#t_prio_multicast").removeClass("disabled");
+        $("#prio_multicast").prop("disabled", false);
+        $("#prio_multicast").tpSelect({
+            refresh: 1
+        });
+    } else {
+        $("#vid_multicast").prop("disabled", true);
+        $("#vid_multicast").prev().addClass("disabled");
+        $("#t_prio_multicast").addClass("disabled");
+        $("#prio_multicast").prop("disabled", true);
+        $("#prio_multicast").tpSelect({
+            refresh: 1
+        });
+    }
+}
+
+
+$("#enable_multicast").click(refresh_multicast_checkbox);
+
+$("#iptv_mode").click(function() {
+    showMode();
+});
+</script>
+
+<body>
+    <h3 id="t_title_itv">IPTV Settings</h3>
+    <div class="content-container">
+        <form class="pure-form pure-form-aligned">
+            <div>
+                <b id="t_iptv">IPTV:</b>
+                <input type="checkbox" id="iptven" />
+                <label id="t_iptv_tip_enable">Enable</label>
+            </div>
+            <div>
+                <b id="t_mode">Mode:</b>
+                <select id="iptv_mode" class="xl">
+                    <option id="t_bridge" value="bridge">Bridge</option>
+                    <option id="t_russia" value="russia">Russia</option>
+                    <option id="t_exstream" value="exstream">ExStream</option>
+                    <option id="t_unifi" value="unifi">Unifi</option>
+                    <option id="t_maxis" value="maxis">Maxis</option>
+                    <option id="t_custom" value="custom">Custom</option>
+                </select>
+            </div>
+            <div id="igmp_proxy_version" class="nd">
+                <b id="t_igmp_proxy">IGMP Proxy:</b>
+                <select id="igmp_version" class="xl">
+                    <option id="t_igmp_v2" value="v2">V2</option>
+                    <option id="t_igmp_v3" value="v3">V3</option>
+                </select>
+            </div>
+            <br/>
+            <div id="vlan_internet">
+                <div class="vid inline">
+                    <b id="t_vid_internet" class="sl">Internet Vlan ID:</b>
+                    <input type="text" id="vid_internet" value="0" size="4" maxlength="4" class="s" />
+                </div>
+                <div class="priority inline line-margin">
+                    <b id="t_prio_internet" class="sl">Internet Vlan Priority:</b>
+                    <select id="prio_internet" class="xs">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                    </select>
+                </div>
+                <div class="other inline line-margin">
+                    <input type="checkbox" id="enable_tag_internet" />
+                    <label class="T_c_tag">802.1q Tag</label>
+                </div>
+            </div>
+            <div id="vlan_ipphone">
+                <div class="vid inline">
+                    <b id="t_vid_ipphone" class="sl">Internet Vlan ID:</b>
+                    <input type="text" id="vid_ipphone" value="0" size="4" maxlength="4" class="s"/>
+                </div>
+                <div class="priority inline line-margin">
+                    <b id="t_prio_ipphone" class="sl">Internet Vlan Priority:</b>
+                    <select id="prio_ipphone" class="xs">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                    </select>
+                </div>
+                <div class="other inline line-margin">
+                </div>
+            </div>
+            <div id="vlan_iptv">
+                <div class="vid inline">
+                    <b id="t_vid_iptv" class="sl">Internet Vlan ID:</b>
+                    <input type="text" id="vid_iptv" value="0" size="4" maxlength="4" class="s" />
+                </div>
+                <div class="priority inline line-margin">
+                    <b id="t_prio_iptv" class="sl">Internet Vlan Priority:</b>
+                    <select id="prio_iptv" class="xs">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                    </select>
+                </div>
+                <div class="other inline line-margin">
+                </div>
+            </div>
+            <div id="vlan_multicast">
+                <div class="vid inline">
+                    <b id="t_vid_multicast" class="sl">Internet Vlan ID:</b>
+                    <input type="text" id="vid_multicast" value="0" size="4" maxlength="4" class="s"/>
+                </div>
+                <div class="priority inline line-margin">
+                    <b id="t_prio_multicast" class="sl">Internet Vlan Priority:</b>
+                    <select id="prio_multicast" class="xs">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                    </select>
+                </div>
+                <div class="other inline line-margin">
+                    <input type="checkbox" id="enable_multicast" />
+                    <label class="T_enable">enable</label>
+                </div>
+            </div>
+            <br/>
+            <div>
+                <b id="t_lan1" class="sl" >LAN:</b>
+                <select id="mode_lan1" class="xl">
+                    <option class="T_c_internet" value="internet">Internet</option>
+                    <option class="T_c_iptv" value="iptv">IPTV</option>
+                    <option class="T_c_ipphone" value="ipphone">IP-Phone</option>
+                </select>
+            </div>
+            <div>
+                <b id="t_lan2" class="sl" >LAN:</b>
+                <select id="mode_lan2" class="xl">
+                    <option class="T_c_internet" value="internet">Internet</option>
+                    <option class="T_c_iptv" value="iptv">IPTV</option>
+                    <option class="T_c_ipphone" value="ipphone">IP-Phone</option>
+                </select>
+            </div>
+            <div>
+                <b id="t_lan3" class="sl">LAN:</b>
+                <select id="mode_lan3" class="xl">
+                    <option class="T_c_internet" value="internet">Internet</option>
+                    <option class="T_c_iptv" value="iptv">IPTV</option>
+                    <option class="T_c_ipphone" value="ipphone">IP-Phone</option>
+                </select>
+            </div>
+            <div>
+                <b id="t_lan4" class="sl">LAN:</b>
+                <select id="mode_lan4" class="xl">
+                    <option class="T_c_internet" value="internet">Internet</option>
+                    <option class="T_c_iptv" value="iptv">IPTV</option>
+                    <option class="T_c_ipphone" value="ipphone">IP-Phone</option>
+                </select>
+            </div>
+
+            <div id="bSave" class="">
+                <button type="submit" class="green T_save" id="b_save" onclick="doSave()">Save</button>
+            </div>
+
+        </form>
+    </div>
+</body>
+
+<script language="javascript" type="text/javascript">
+$.tpInit();
+/* init data when style is ready */
+init();
+</script>

@@ -1,0 +1,316 @@
+﻿<script type="text/javascript" language="javascript">
+function doEnable24g(bChecked) {
+    if (bChecked == true)
+        $("#form24G :input[type='text']").attr("disabled", false);
+    else
+        $("#form24G :input[type='text']").attr("disabled", true);
+}
+
+function doEnable5g(bChecked) {
+    if (bChecked == true)
+        $("#form5G :input[type='text']").attr("disabled", false);
+    else
+        $("#form5G :input[type='text']").attr("disabled", true);
+}
+
+function doCollect() {
+    $.qd.wl.en = $("#enWl24g").prop("data-checked") ? true : false;
+    $.qd.wl.ssid = $("#wl24gSSID").val();
+    $.qd.wl.pwd = $("#wl24gPwd").val();
+
+    if (INCLUDE_LAN_WLAN_DUALBAND) {
+        $.qd.wl5g.en = $("#enWl5g").prop("data-checked") ? true : false;
+        $.qd.wl5g.ssid = $("#wl5gSSID").val();
+        $.qd.wl5g.pwd = $("#wl5gPwd").val();
+    }
+}
+
+function isHex(str, arg) {
+    str = str.toLowerCase();
+    for (var i = 0; i < str.length; i++) {
+        if ((str.charAt(i) >= '0' && str.charAt(i) <= '9') || (str.charAt(i) >= 'a' && str.charAt(i) <= 'f'))
+            continue;
+        else {
+            if (arg != 0)
+                $.alert(ERR_WLAN_WEP_KEY_HEX_INVALID);
+            return false;
+        }
+    }
+    if (parseInt(str, 16) == 0) {
+        if (arg != 0)
+            $.alert(ERR_WLAN_WEP_KEY_HEX_INVALID);
+        return false;
+    }
+    return true;
+}
+
+function checkSSID(inputBox) {
+    var ssidLen = $.realLen(inputBox.prop('value'));
+
+    if (ssidLen <= 0) {
+        $.alert(ERR_WLAN_SSID_IS_EMPTY);
+        inputBox.focus();
+        inputBox.select();
+        return false;
+    } else if (ssidLen > 32) {
+        $.alert(ERR_WLAN_SSID_LEN_OUTRANGE);
+        inputBox.focus();
+        inputBox.select();
+        return false;
+    }
+
+    return true;
+}
+
+function checkPassword(inputBox) {
+    var pwd = inputBox.prop("value");
+    if (pwd.length == 0) {
+        $.alert(ERR_WLAN_WPA_PSK_EMPTY);
+        inputBox.focus();
+        inputBox.select();
+        return false;
+    } else if (pwd.length < 8) {
+        $.alert(ERR_WLAN_WPA_PSK_LENGTH_INVALID);
+        inputBox.focus();
+        inputBox.select();
+        return false;
+    } else if (pwd.length >= 64) {
+        if (!isHex(pwd, 0)) {
+            $.alert(ERR_WLAN_WPA_PSK_HEX_INVALID);
+            inputBox.focus();
+            inputBox.select();
+            return false;
+        }
+        inputBox.val(inputBox.val().substr(0, 64));
+    } else {
+        if ($.asc(pwd, true)) {
+            $.alert(ERR_WLAN_WPA_PSK_ASCII_INVALID);
+            inputBox.focus();
+            inputBox.select();
+            return false;
+        }
+    }
+
+}
+
+function chkParamsChange() {
+    var ret = false;
+    var currWlan24g = {
+        en: $("#enWl24g").prop("data-checked") ? 1 : 0,
+        ssid: $("#wl24gSSID").val(),
+        pwd: $("#wl24gPwd").val()
+    };
+
+    if (INCLUDE_LAN_WLAN_DUALBAND) {
+        var currWlan5g = {
+            en: $("#enWl5g").prop("data-checked") ? 1 : 0,
+            ssid: $("#wl5gSSID").val(),
+            pwd: $("#wl5gPwd").val()
+        };
+    }
+
+    /* get wlan data from DM */
+    dmWlanList = $.act(ACT_GL, LAN_WLAN, null, null, ["Enable", "SSID", "X_TP_Band", "X_TP_PreSharedKey"]);
+    err = $.exe();
+    if (err) {
+        $.alert(err);
+        return;
+    }
+
+    $.each(dmWlanList, function() {
+        if (this.X_TP_Band == "2.4GHz") {
+            if (this.enable != currWlan24g.en || this.SSID != currWlan24g.ssid || this.X_TP_PreSharedKey != currWlan24g.pwd) {
+                ret = true;
+                return false;
+            }
+        } else if (INCLUDE_LAN_WLAN_DUALBAND && this.X_TP_Band == "5GHz") {
+            if (this.enable != currWlan5g.en || this.SSID != currWlan5g.ssid || this.X_TP_PreSharedKey != currWlan5g.pwd) {
+                ret = true;
+                return false;
+            }
+        }
+    });
+
+    return ret;
+}
+
+function doCheck() {
+    if ($("#enWl24g").prop("data-checked")) {
+        if (checkSSID($("#wl24gSSID")) == false)
+            return false;
+        if (checkPassword($("#wl24gPwd")) == false)
+            return false;
+    }
+
+    if (INCLUDE_LAN_WLAN_DUALBAND) {
+        if ($("#enWl5g").prop("data-checked")) {
+            if (checkSSID($("#wl5gSSID")) == false)
+                return false;
+            if (checkPassword($("#wl5gPwd")) == false)
+                return false;
+        }
+    }
+    return true;
+}
+
+function goNext() {
+    if (flowSteps[currIndex].file != "qsWl.htm") {
+        return;
+    }
+
+    if (doCheck() == false) {
+        return;
+    }
+
+    doCollect();
+    /* $.qd.wlChange = chkParamsChange(); */
+    $.qf.next();
+}
+
+function goPrev() {
+    if (flowSteps[currIndex].file != "qsWl.htm") {
+        return;
+    }
+    /*
+    if (doCheck() == false) {
+        return;
+    }
+    */
+    doCollect();
+
+    $.qf.prev();
+}
+</script>
+<div id="quicksetup_wl_container">
+    <div id="div_wlanSetting">
+        <p id="t_wlSettingNote">You can rename your wireless network name and create your own password.</p>
+        <div>
+            <form id="form24G" class="pure-form pure-form-aligned">
+                <div>
+                    <b class="T_c_wl24g l">Wireless Network (2.4GHz):</b>
+                    <input type="checkbox" id="enWl24g" />
+                    <label class="T_c_enWl">Enable Wireless Radio</label>
+                </div>
+                <div>
+                    <b class="T_c_ssid l">Wireless Network Name (SSID):</b>
+                    <input type="text" id="wl24gSSID" maxlength="32" class="xl" />
+                </div>
+                <div>
+                    <b class="T_c_wlPwd l">Password:</b>
+                    <input type="text" id="wl24gPwd" maxlength="64" class="tp-input-text xl" />
+                </div>
+                <div id="24gWarn">
+                    <label class="label-title"></label>
+                    <span></span>
+                </div>
+            </form>
+        </div>
+        <div style="margin-top: 40px;">
+            <form id="form5G" class="pure-form pure-form-aligned nd">
+                <div>
+                    <b class="T_c_wl5g l">Wireless Network (5GHz):</b>
+                    <input type="checkbox" id="enWl5g" />
+                    <label class="T_c_enWl">Enable Wireless Radio</label>
+                </div>
+                <div>
+                    <b class="T_c_ssid l">Wireless Network Name (SSID):</b>
+                    <input type="text" id="wl5gSSID" maxlength="32" class="xl" />
+                </div>
+                <div>
+                    <b class="T_c_wlPwd l">Password:</b>
+                    <input type="text" id="wl5gPwd" maxlength="64" class="tp-input-text xl" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="inline-btn-right quicksetup-button-container">
+    <div class="inline">
+        <button type="submit" class="green T_back" id="back" onclick="goPrev()">Back</button>
+    </div>
+    <div class="inline">
+        <button type="submit" class="green T_next" id="next" onclick="goNext()">Next</button>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+var dmWlanList = {};
+
+function init24g(wl24cfg) {
+    $("#wl24gSSID").val(wl24cfg.ssid);
+    $("#wl24gPwd").val(wl24cfg.pwd);
+    if (wl24cfg.en == 1)
+        $("#enWl24g").attr("checked", true);
+    else {
+        $("#enWl24g").attr("checked", false);
+        $("#wl24gSSID").attr("disabled", true);
+        $("#wl24gPwd").attr("disabled", true);
+    }
+    $("#enWl24g").on("click", function() {
+        doEnable24g($(this).prop("data-checked"));
+    });
+}
+
+function init5g(wl5cfg) {
+    $("#wl5gSSID").val(wl5cfg.ssid);
+    $("#wl5gPwd").val(wl5cfg.pwd);
+    if (wl5cfg.en == 1)
+        $("#enWl5g").attr("checked", true);
+    else {
+        $("#enWl5g").attr("checked", false);
+        $("#wl5gSSID").attr("disabled", true);
+        $("#wl5gPwd").attr("disabled", true);
+    }
+    $("#enWl5g").on("click", function() {
+        doEnable5g($(this).prop("data-checked"));
+    });
+}
+
+function init() {
+    var err;
+    needGetData = false;
+    if (!$.qd.wl) {
+        $.qd.wl = {};
+        needGetData = true;
+    }
+
+    if (INCLUDE_LAN_WLAN_DUALBAND && !$.qd.wl5g) {
+        $.qd.wl5g = {};
+        needGetData = true;
+    }
+
+    if (INCLUDE_LAN_WLAN_DUALBAND) {
+        $("#form5G").removeClass("nd");
+    }
+
+    if (needGetData == true) {
+        dmWlanList = $.act(ACT_GL, LAN_WLAN, null, null, ["Enable", "SSID", "X_TP_Band", "X_TP_PreSharedKey"]);
+        err = $.exe();
+        if (err) {
+            $.alert(err);
+            return;
+        }
+        $.each(dmWlanList, function() {
+            if (this.X_TP_Band == "2.4GHz") {
+                $.qd.wl.stack = this.__stack;
+                $.qd.wl.en = this.enable == 1 ? true : false;
+                $.qd.wl.ssid = this.SSID;
+                $.qd.wl.pwd = this.X_TP_PreSharedKey;
+            } else if (INCLUDE_LAN_WLAN_DUALBAND && this.X_TP_Band == "5GHz") {
+                $.qd.wl5g.stack = this.__stack;
+                $.qd.wl5g.en = this.enable == 1 ? true : false;
+                $.qd.wl5g.ssid = this.SSID;
+                $.qd.wl5g.pwd = this.X_TP_PreSharedKey;
+            }
+        });
+    }
+
+    init24g($.qd.wl);
+
+    if (INCLUDE_LAN_WLAN_DUALBAND)
+        init5g($.qd.wl5g);
+}
+
+(function() {
+    $.tpInit(init);
+})();
+</script>

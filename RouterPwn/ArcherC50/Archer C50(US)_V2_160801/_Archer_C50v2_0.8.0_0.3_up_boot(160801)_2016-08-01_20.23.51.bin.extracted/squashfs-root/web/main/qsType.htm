@@ -1,0 +1,317 @@
+﻿<script type="text/javascript" language="javascript">
+function goNext() {
+    if (flowSteps[currIndex].file != "qsType.htm"){
+        return; 
+    }
+
+    /* set $.qd.eth.connectionType */
+    var value = $("input[type=radio][name=wanType]:checked").val();
+    if (typeof value == "undefined") {
+        $.alert(ERR_QUICK_SETUP_NO_OPTION);
+        return;
+    }
+
+    $.qd.eth.connectionType = value;
+    $.qf.next();
+}
+
+function goBack(){
+    if (flowSteps[currIndex].file != "qsType.htm"){
+        return ;
+    }
+
+    var value = $("input[type=radio][name=wanType]:checked").val();
+    $.qd.eth.connectionType = value;
+    $.qf.prev();
+}
+
+</script>
+<div id="quicksetup_wan_type_container content-container">
+    <form class="pure-form pure-form-aligned">
+        <div class="inline">
+            <button type="submit" class="blue T_detect" id="detect" value="Detect" onclick="doWanDetect()">AutoDetect</button>
+        </div>
+        <div class="inline">
+            <span id="status" class="blue"></span>
+        </div>
+    </form>
+    <form class="pure-form pure-form-aligned">
+        <div>
+            <input type="radio" name="wanType" id="qsDynIp" value="DynamicIp" />
+            <label id="c_qsDynIp">Dynamic IP</label>
+        </div>
+        <div>
+            <input type="radio" name="wanType" id="qsStaIp" value="StaticIp" />
+            <label id="c_qsStaIp">Static IP</label>
+        </div>
+        <div>
+            <input type="radio" name="wanType" id="qsPppoe" value="PPPoE" />
+            <label id="c_qsPPPoE">PPPoE</label>
+        </div>
+        <div>
+            <input type="radio" name="wanType" id="qsL2tp" value="L2tp" />
+            <label id="c_qsL2TP">L2TP</label>
+        </div>
+        <div>
+            <input type="radio" name="wanType" id="qsPptp" value="Pptp" />
+            <label id="c_qsPPTP">PPTP</label>
+        </div>
+    </form>
+    <p class="note">
+        <span class="note_title" id="t_note_title">Note:</span>
+        <span id="t_typeNote">If you are not sure which Internet Connection Type you have, use Auto Detect or contact your Internet Service Provider (ISP) for assistance.</span>
+    </p>
+</div>
+
+<div class="inline-btn-right quicksetup-button-container">
+    <div class="inline">
+        <button type="submit" class="green T_back" id="back" onclick="goBack()">Back</button>
+    </div>
+    <div class="inline">
+        <button type="submit" class="green T_next" id="next" onclick="goNext()">Next</button>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+if (typeof($.qd.eth) == "undefined") {
+    $.qd.eth = getParam();
+}
+
+/* set radio select */
+$("input[type=radio][name=wanType][value=" + $.qd.eth.connectionType + "]").prop("checked", true);
+
+$.tpInit();
+
+function wanDetecting() {
+    var wanTypeObj = $.act(ACT_GET, WAN_TYPE_DETECT, null, null, ["state", "wanType"]);
+    if (!$.exe()) {
+        if (wanTypeObj.state == 3) {
+            var qtype;
+            switch (wanTypeObj.wanType) {
+                case "0":
+                    $("#status").html(s_str.dynip);
+                    qtype = "DynamicIp"
+                    break;
+                case "1":
+                    $("#status").html(s_str.staip);
+                    qtype = "StaticIp"
+                    break;
+                case "2":
+                    $("#status").html(s_str.pppoe);
+                    qtype = "PPPoE";
+                    break;
+                default:
+                    $("#status").html(s_str.staip);
+                    qtype = "StaticIp"
+                    break;
+            }
+
+            if (qtype != undefined)
+            {
+                $("input[type=radio][name=wanType][value=" + qtype + "]").prop("checked", true);
+
+                $("#qsDynIp").tpRadio({
+                       refresh: 1
+                });
+                $("#qsPppoe").tpRadio({
+                      refresh: 1
+                });
+                $("#qsStaIp").tpRadio({
+                       refresh: 1
+                });
+                $("#qsL2tp").tpRadio({
+                      refresh: 1
+                });
+                $("#qsPptp").tpRadio({
+                       refresh: 1
+                });
+            }
+        } else
+            $.timeout(function() {
+                wanDetecting();
+            }, 1500);
+    }
+}
+
+function doWanDetect() {
+    var wanTypes = $.act(ACT_GL, WAN_COMMON_INTF_CFG, null, null, ["WANAccessType"]);
+    if (!$.exe()) {
+        $.each(wanTypes, function() {
+            if (this.WANAccessType == "Ethernet")
+                pStk = this.__stack;
+        });
+    }
+
+    var wanEthIntfObj = $.act(ACT_GET, WAN_ETH_INTF, pStk, null, ["status"]);
+    if (!$.exe()) {
+        if (wanEthIntfObj.status == "NoLink") {
+            $("#status").html(m_str.unplugged);
+            return;
+        } else {
+            $.act(ACT_OP, ACT_OP_WAN_TYPE_DETECT, null);
+
+            if (!$.exe()) {
+                $("#status").html(m_str.detecting);
+                $.timeout(function() {
+                    wanDetecting();
+                }, 1500);
+            }
+        }
+    }
+}
+
+function getParam() {
+    var ethParam = {};
+    var realSysMode = $.act(ACT_GET, SYS_MODE, null, null);
+    var wans = $.act(ACT_GL, WAN_COMMON_INTF_CFG, null, null, ["WANAccessType"]);
+    if (INCLUDE_BPA) {
+        var ips = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable","name", "connectionType", "addressingType", "externalIPAddress", "subnetMask", "defaultGateway", "DNSServers", "MACAddressOverride", "X_TP_ClonedMACAddress", "X_TP_IPv4Enabled", "X_TP_BpaEnable"]);
+    } else {
+        var ips = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable", "name", "connectionType", "addressingType", "externalIPAddress", "subnetMask", "defaultGateway", "DNSServers", "MACAddressOverride", "X_TP_ClonedMACAddress", "X_TP_IPv4Enabled"]);
+    }
+
+    var ppps = $.act(ACT_GL, WAN_PPP_CONN, null, null, ["enable", "name", "transportType", "username", "password", "X_TP_IPv4Enabled", "X_TP_SecondConnection", "X_TP_SecondConnectionIPAddress", "X_TP_SecondConnectionSubnetMask"]);
+
+    var l3f = $.act(ACT_GET, L3_FORWARDING, null, null, ["__ifAliasName"]);
+
+    if (INCLUDE_L2TP) {
+        var wanL2tpList = $.act(ACT_GL, WAN_L2TP_CONN, null, null, ["enable", "name", "addressingType", "transportType", "Username", "Password", "ServerIpOrName", "ExternalIPAddressIP", "SubnetMaskIP", "DefaultGatewayIP", "DNSServersIP"]);
+    }
+    if (INCLUDE_PPTP) {
+        var wanPptpList = $.act(ACT_GL, WAN_PPTP_CONN, null, null, ["enable", "name", "addressingType", "transportType", "Username", "Password", "ServerIpOrName", "ExternalIPAddressIP", "SubnetMaskIP", "DefaultGatewayIP", "DNSServersIP"]);
+    }
+    if ($.exe()) return;
+    systemMode = realSysMode.mode;
+
+    if (systemMode == "ETH") {
+        $.each(ips, function() {
+            if ($.arr2obj(wans, "__stack")[$.stkPop(this.__stack, 2)].WANAccessType === "Ethernet" &&
+                this.X_TP_IPv4Enabled == 1) {
+                var type;
+                if (this.addressingType == "Static") {
+                    type = "StaticIp";
+                    dns = this.DNSServers.split(",");
+                    ethParam.staticIp = {
+                        enable: this.enable,
+                        name: this.name,
+                        stack: this.__stack,
+                        wan: $.stkPop(this.__stack, 2),
+                        linkType: type,
+                        ip: this.externalIPAddress,
+                        mask: this.subnetMask,
+                        gw: this.defaultGateway,
+                        dns: dns[0],
+                        dns2: dns[1]
+                    };
+                } else if (this.addressingType == "DHCP" && this.X_TP_BpaEnable != 1) {
+                    type = "DynamicIp";
+                    ethParam.dynamicIp = {
+                        enable: this.enable,
+                        name: this.name,
+                        stack: this.__stack,
+                        wan: $.stkPop(this.__stack, 2),
+                        linkType: type,
+                        MACAddressOverride: this.MACAddressOverride,
+                        X_TP_ClonedMACAddress: this.X_TP_ClonedMACAddress
+                    };
+                } else if (INCLUDE_BPA && this.X_TP_BpaEnable == 1) {
+                    type = "Bpa";
+                    ethParam.bpa = {
+                        enable: this.enable,
+                        name: this.name,
+                        stack: this.__stack,
+                        wam: $.stkPop(this.__stack, 2),
+                        linkType: type
+                    };
+                }
+
+                if (this.name === l3f.__ifAliasName) {
+                    intfCfgStack = $.stkPop(this.__stack, 2);
+                    ethParam.connectionType = type;
+                }
+            }
+        });
+
+        $.each(ppps, function() {
+            if ($.arr2obj(wans, "__stack")[$.stkPop(this.__stack, 2)].WANAccessType === "Ethernet" &&
+                this.X_TP_IPv4Enabled == 1) {
+                if (this.transportType == "PPPoE") {
+                    ethParam.pppoe = {
+                        enable: this.enable,
+                        name: this.name,
+                        stack: this.__stack,
+                        wan: $.stkPop(this.__stack, 2),
+                        linkType: this.transportType,
+                        usr: this.username,
+                        pwd: this.password,
+                        secondConnection: this.X_TP_SecondConnection,
+                        secondConnectionIPAddress: this.X_TP_SecondConnectionIPAddress,
+                        secondConnectionSubnetMask: this.X_TP_SecondConnectionSubnetMask
+                    };
+                    if (this.name === l3f.__ifAliasName) {
+                        intfCfgStack = $.stkPop(this.__stack, 2);
+                        ethParam.connectionType = this.transportType;
+                    }
+                }
+            }
+        });
+
+        if (INCLUDE_PPTP) {
+            $.each(wanPptpList, function() {
+                if ($.arr2obj(wans, "__stack")[$.stkPop(this.__stack, 1)].WANAccessType === "Ethernet") {
+                    dns = this.DNSServersIP.split(",");
+                    ethParam.pptp = {
+                        enable: this.enable,
+                        name: this.name,
+                        stack: this.__stack,
+                        wan: $.stkPop(this.__stack, 1),
+                        linkType: "Pptp",
+                        addressingType: this.addressingType,
+                        usr: this.username,
+                        pwd: this.password,
+                        srvAddrName: this.serverIpOrName,
+                        ip: this.externalIPAddressIP,
+                        mask: this.subnetMaskIP,
+                        gw: this.defaultGatewayIP ? this.defaultGatewayIP : "0.0.0.0",
+                        dns: dns[0],
+                        dns2: dns[1]
+                    };
+
+                    if (this.name === l3f.__ifAliasName) {
+                        intfCfgStack = $.stkPop(this.__stack, 1);
+                        ethParam.connectionType = "Pptp";
+                    }
+                }
+            });
+        }
+
+        if (INCLUDE_L2TP) {
+            $.each(wanL2tpList, function() {
+                if ($.arr2obj(wans, "__stack")[$.stkPop(this.__stack, 1)].WANAccessType === "Ethernet") {
+                    dns = this.DNSServersIP.split(",");
+                    ethParam.l2tp = {
+                        enable: this.enable,
+                        name: this.name,
+                        stack: this.__stack,
+                        wan: $.stkPop(this.__stack, 1),
+                        linkType: "L2tp",
+                        addressingType: this.addressingType,
+                        usr: this.username,
+                        pwd: this.password,
+                        srvAddrName: this.serverIpOrName,
+                        ip: this.externalIPAddressIP,
+                        mask: this.subnetMaskIP,
+                        gw: this.defaultGatewayIP ? this.defaultGatewayIP : "0.0.0.0",
+                        dns: dns[0],
+                        dns2: dns[1]
+                    };
+                    if (this.name === l3f.__ifAliasName) {
+                        intfCfgStack = $.stkPop(this.__stack, 1);
+                        ethParam.connectionType = "L2tp";
+                    }
+                }
+            });
+        }
+    }
+    return ethParam;
+}
+</script>

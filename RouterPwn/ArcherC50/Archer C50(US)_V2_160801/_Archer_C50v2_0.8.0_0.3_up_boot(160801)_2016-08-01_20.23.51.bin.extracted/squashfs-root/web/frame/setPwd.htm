@@ -1,0 +1,642 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<head>
+    <link rel="shortcut icon" type="image/x-icon" href="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAL/SURBVHhe7dw/a1NRGMdxX4Kbg4Pg0MHBd+Du4Cbo5ubg7uArcXDvpGL9tyiI2FLQQScHFSlJqsakSm2j/W8LD+dAuTzxnnju0dv8vg98xpzLk35pm+SSY8dvd/ahiwDEEYA4AhBHAOIIQBwBiCMAcQQgjgDEEYA4AhBHAOIIQBwBiCMAcQQgjgDEEYA4AhBHAOIIQBwBiCMAcQQgjgDEEYA4AhBHAOIIQBwBiCMAcQQgjgDEEYA4AhBHAOIIQBwBiCMAcQQgjgDE1QZw8l7XXHu1MhVmHvZMdc8ri0PjPaZNLi8MzKm5nqnuMSkCCAhgjLOPP5lpmQvP+6a6Z2e0Y47K7Oz9NrNL6+b0/Z6p7lWHAAICGIMAjsa8W9s28U92db9xCCAggDFmHiyb+cFGltWtPZM73tmTOPfks6numRtAf2PXeNdM0dTzc/P9D1PdbxwCCAigsLho7nhnNyE3gNmlkfHOThFf1r1d3TJ/Oyubu8a7hocAAgIojADSXH/9zeRO/Ofdu8ZhBBAQQGEEkCa+5Zs7BDAhAiiMANIQQM14ZzeBAAojgDQEUDPe2U0ggMIIIA0B1Ix3dhMIoDACSEMANeOd3QQCKIwA0tzpjkzunHm0bLxrHEYAAQEUNu0BLA43TfwVnurGm+/m6ZdfJnc+rm8bb0cPAQQEUNi0B/C/J94mfvHFV+Pt6CGAgAAKI4AyE29GvTQ/MN5uf0IAAQEUNu0BxB9E3LNpc72f5taHNXP15dCcuNs13k4pCCAggMLiIrnjnd2E3ACaeiPoXyOAgAAKI4B2IoCAAAojgHYigIAACiOAdiKAgAAKI4B2IoCAAAqLH1N6N0VMwju7CblfFHn+Wd94Z7cZAQQEAEkEII4AxBGAOAIQRwDiCEAcAYgjAHEEII4AxBGAOAIQRwDiCEAcAYgjAHEEII4AxBGAOAIQRwDiCEAcAYgjAHEEII4AxBGAOAIQRwDiCEAcAYgjAHEEII4AxBGAOAIQRwDiCEAcAYgjAHEEIK2zfwCdZ2Aa9hLJlQAAAABJRU5ErkJggg==" />
+    <style type="text/css">
+    body {
+        text-align: left;
+        margin: 0;
+        font: 12px Verdana, Arial;
+    }
+    #top {
+        width: 100%;
+        height: 90px;
+        overflow: hidden;
+        position: relative;
+        background: #10abe1;
+        top: 0;
+    }
+    #scroll {
+        height: calc(100% - 90px);
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    #topContainer {
+        width: 1000px;
+        margin: 0 auto;
+        text-align: left;
+    }
+    #topProduct {
+        font: bold 12px verdana;
+        color: white;
+        text-decoration: none;
+        display: block;
+        float: left;
+        background: url("../img/login/logo.png") no-repeat left;
+        line-height: 16px;
+        padding: 66px 0 20px;
+        width: 230px;
+        margin-left: -32px;
+    }
+    #topProductName {
+        margin-left: 31px;
+    }
+    .top-control {
+        display: inline-block;
+    }
+    .top-lang {
+        margin: 0 26px 12px 88px;
+        display: inline-block;
+        vertical-align: bottom;
+        width: 100px;
+    }
+    #loginMain {
+        text-align: center;
+        min-height: 100%;
+    }
+    #bottom {
+        background: #e6e6e6;
+        min-width: 1000px;
+        height: 56px;
+    }
+    #bottomContainer {
+        width: 100%;
+        margin: 0 auto;
+        position: fixed;
+        bottom: 0;
+    }
+    .inline-block {
+        display: inline-block;
+    }
+    div.login-field {
+        margin: 5px 0;
+    }
+    label#login-username-label span.icon, label#login-password-label span.icon {
+        /*background: url("../img/login/icons-01.png") no-repeat scroll -148px -4px;*/
+        display: inline-block;
+        height: 27px;
+        margin-right: 14px;
+        width: 27px;
+        vertical-align: middle;
+    }
+    label#login-username-label span.icon {
+        background-position: -148px -4px;
+    }
+    label#login-password-label span.icon {
+        background-position: -184px -4px;
+    }
+    div.login-content {
+        height: 150px;
+        width: 420px;
+        min-height: 100%;
+        position: relative;
+        margin: 100px auto;
+    }
+    input, button {
+        color: #4d4d4d;
+        font-family: Verdana, sans-serif;
+    }
+    input[type="text"], input[type="password"] {
+        padding: .5em .6em;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        outline-color: #ffffff;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 184px;
+    }
+    input[type="text"].input-error, input[type="password"].input-error {
+        border: 1px solid red;
+    }
+    input[type="text"].input-focus, input[type="password"].input-focus {
+        border: 1px solid #10abe1;
+    }
+    div.inputarea {
+        position: relative;
+        display: inline-block;
+    }
+    div.inputarea label {
+        position: absolute;
+        top: 9px;
+        left: 10px;
+        color: #b3b3b3;
+        cursor: text;
+    }
+    div.login-btn {
+        margin: 0;
+    }
+    button.button-button {
+        border: none;
+        border-radius: 3px;
+        color: #ffffff;
+        height: inherit;
+        width: 184px;
+        background-color: #96cc56;
+        padding: 8px 6px 9px;
+        cursor: pointer;
+    }
+    div.widget-error-tips {
+        display: none;
+        position: absolute;
+        z-index: 299;
+        top: 135px;
+        left: 55px;
+    }
+    div.widget-error-tips.user-tips {
+        top: 36px;
+        left: 116px;
+    }
+    div.widget-error-tips.pwd-tips {
+        display: none;
+        position: absolute;
+        z-index: 299;
+        top: 98px;
+        left: 116px;
+    }
+    div.widget-error-tips span.widget-error-tips-delta {
+        background: url("../img/login/icons-02.png") no-repeat scroll -332px -56px;
+        display: block;
+        height: 8px;
+        left: 20px;
+        position: absolute;
+        top: -7px;
+        width: 13px;
+    }
+    div.widget-error-tips span.widget-error-tips-delta.long {
+        left: 150px;
+    }
+    div.widget-error-tips div.widget-error-tips-wrap {
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-shadow: 1px 1px 8px #898989;
+        width: 100%;
+        min-width: 130px;
+        max-width: 300px;
+        text-align: left;
+        padding: 10px 12px;
+    }
+    div.secLevel {
+        margin-bottom: 5px;
+    }
+    div.secLevel span {
+        width: 58px;
+        height: 13px;
+        margin-left: -3px;
+        line-height: 13px;
+        text-align: center;
+        color: #FFF;
+        background-color: #C9C9C9;
+        display: inline-block;
+        font-size: 10px;
+    }
+    div.secLevel.level1 span.ori.level1 {
+        background-color: #DD4040;
+    }
+    div.secLevel.level2 span.ori.level2 {
+        background-color: #F7931E;
+    }
+    div.secLevel.level3 span.ori.level3 {
+        background-color: #10ABE1;
+    }
+    </style>
+    <script type="text/javascript">
+    var isLocked = false,
+        tipsTextRequired = "This field is required.",
+        tipsTextAscii = "Please input visiable ASCII characters.",
+        tipsTextLength = "Your password is invalid. Passwords may contain 1-15 letters and numbers.",
+        tipsTextConfirm = "Passwords do not match, please try again.",
+        note = "<span style='color: red;'>Note:</span> <br /> To ensure the safety of your network, it is highly recommended that you set up a strong new password. Passwords may contain 1~15 (Case-sensitive) letters and numbers.",
+        timesText = "You have exceeded five login attempts. Please try again in ";
+
+    var pwdCheckOK = false;
+
+    function $(id) {
+        return document.getElementById(id);
+    }
+
+    function inArray(elem, elems) {
+        for (var i = 0, l = elems.length; i < l; i++)
+            if (elems[i] === elem)
+                return true;
+        return false;
+    }
+
+    function hasClass(elem, className) {
+        return elem && inArray(className, (elem.className ? elem.className : "").split(/\s+/));
+    }
+
+    function addClass(elem, className) {
+        if (elem && elem.nodeType == 1 && !hasClass(elem, className))
+            elem.className += (elem.className ? " " : "") + className;
+    }
+
+    function removeClass(elem, className) {
+        if (elem && elem.nodeType == 1 && hasClass(elem, className)) {
+            elem.className = elem.className.replace(className, "");
+            elem.className = elem.className.replace(/\s+/, " ");
+        }
+    }
+
+    function Base64Encoding(input) {
+        var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+        input = utf8_encode(input);
+        while (i < input.length) {
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+
+            if (isNaN(chr2)) {
+                enc3 = enc4 = 64;
+            } else if (isNaN(chr3)) {
+                enc4 = 64;
+            }
+            output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+        }
+        return output;
+    }
+
+    function utf8_encode(string) {
+        string = string.replace(/\r\n/g, "\n");
+        var utftext = "";
+
+        for (var n = 0; n < string.length; n++) {
+            var c = string.charCodeAt(n);
+            if (c < 128) {
+                utftext += String.fromCharCode(c);
+            } else if ((c > 127) && (c < 2048)) {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            } else {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+        }
+        return utftext;
+    }
+
+    function deleteCookie(name) {
+        var LargeExpDate = new Date();
+        document.cookie = name + "=; expires=" + LargeExpDate.toGMTString();
+    }
+
+    function getHttpObject(hook) {
+        var xmlHttp = null;
+        try {
+            xmlHttp = new XMLHttpRequest();
+        } catch (e) {
+            try {
+                xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+                try {
+                    xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (e) {
+                    /* How to handle this error? */
+                }
+            }
+        }
+        xmlHttp.onreadystatechange = function() {
+            if (xmlHttp.readyState == 4) {
+                if (hook)
+                    hook();
+            }
+        };
+        return xmlHttp;
+    }
+
+    function lockWeb(bLock) {
+        $("userName").disabled = bLock;
+        $("pcPassword").disabled = bLock;
+    }
+
+    function resize() {
+        $("loginMain").style.height = 'auto';
+    }
+
+    function pwdBlur() {
+        if ($("newPwd").value == "") {
+            $("pwdLabel").style.display = "inline";
+        }
+        $("errorTips").style.display = "none";
+        removeClass($("newPwd"), "input-focus");
+    }
+
+    function cfmBlur() {
+        if ($("confirm").value == "") {
+            $("cfmLabel").style.display = "inline";
+        }
+        removeClass($("confirm"), "input-focus");
+    }
+
+    function pwdFocus() {
+        $("pwdLabel").style.display = "none";
+        $("usrTips").style.display = "none";
+        removeClass($("newPwd"), "input-error");
+        addClass($("newPwd"), "input-focus");
+    }
+
+    function cfmFocus() {
+        if (pwdCheckOK == false) {
+            var $password = $('newPwd');
+            $password.focus();
+            checkPwd();
+            return;
+        }
+        $("cfmLabel").style.display = "none";
+        var $confirm = $("confirm");
+
+        $("pwdTips").style.display = "none";
+        removeClass($("confirm"), "input-error");
+        addClass($("confirm"), "input-focus");
+    }
+
+    function PCWin(event) {
+        if (event.keyCode == 13) {
+            PCSubWin();
+        }
+
+    }
+
+    function doSetPassword() {
+        var xmlHttpObj;
+
+        xmlHttpObj = getHttpObject(function() {
+            if (xmlHttpObj.status == 200) {
+                window.location.reload();
+            } else
+                return;
+        });
+        var prePwd = encodeURIComponent(Base64Encoding($("newPwd").value));
+        xmlHttpObj.open("POST", "http://" + window.location.hostname + "/cgi/setPwd?pwd=" + prePwd, true);
+        xmlHttpObj.send(null);
+    }
+
+    function PCSubWin() {
+        var $password = $("newPwd");
+        var $confirm = $("confirm");
+        if ($password.value == "") {
+            addClass($password, "input-error");
+            $("usrTips").style.display = "inline";
+            $("tipsContentUsr").innerHTML = tipsTextRequired;
+            return;
+        }
+        if ($password.value.length > 15) {
+            addClass($password, "input-error");
+            $("usrTips").style.display = "inline";
+            $("tipsContentUsr").innerHTML = tipsTextLength;
+            return;
+        }
+        if ($confirm.value == "") {
+            addClass($confirm, "input-error");
+            $("pwdTips").style.display = "inline";
+            $("tipsContentPwd").innerHTML = tipsTextRequired;
+            return;
+        }
+        if ($confirm.value != $password.value) {
+            addClass($confirm, "input-error");
+            $("pwdTips").style.display = "inline";
+            $("tipsContentPwd").innerHTML = tipsTextConfirm;
+            return;
+        }
+
+        doSetPassword();
+    }
+
+    function pageLoad() {
+        window.onresize = resize;
+        var tipStr = "",
+            $note = $("errorContent"),
+            $password = $("newPwd"),
+            $confirm = $("confirm");
+
+        deleteCookie("Authorization");
+
+        try {
+            if (modelName) {
+                document.title = modelName;
+                $("topProductName").innerHTML = modelName;
+                $("mnum").innerHTML = "Model No. " + modelName;
+            }
+            if (modelDesc) {
+                $("mname").innerHTML = modelDesc;
+            }
+        } catch (e) {}
+
+        $("errorTips").style.display = "inline";
+        $note.innerHTML = note;
+    }
+
+    function checkPwd() {
+        var $password = $("newPwd");
+        var $confirm = $('confirm');
+        var $pwdCheck = $('pwdCheck');
+
+        var asciiWithoutSpace = /^(?=[^ ]+$)[\x21-\x7f]+$/;
+        var upperRe = /[A-Z]/;
+        var lowerRe = /[a-z]/;
+        var otherRe = /(.[^a-zA-Z0-9])/;
+        var digitRe = /\d/;
+
+        var hasUpper = 0;
+        var hasLower = 0;
+        var hasDigit = 0;
+        var hasOther = 0;
+        var largeLength = 0;
+
+        var level = 0;
+
+        if (asciiWithoutSpace.test($password.value) === false) {
+            removeClass($pwdCheck, 'level1');
+            removeClass($pwdCheck, 'level2');
+            removeClass($pwdCheck, 'level3');
+
+            addClass($password, "input-error");
+            $("usrTips").style.display = "inline";
+            if ($password.value == '') {
+                $("tipsContentUsr").innerHTML = tipsTextRequired;
+            } else {
+                $("tipsContentUsr").innerHTML = tipsTextAscii;
+            }
+            pwdCheckOK = false;
+            return;
+        } else {
+            removeClass($password, "input-error");
+            $("usrTips").style.display = "none";
+
+            if (upperRe.test($password.value)) {
+                hasUpper = 1;
+            } else {
+                hasUpper = 0;
+            }
+
+            if (lowerRe.test($password.value)) {
+                hasLower = 1;
+            } else {
+                hasLower = 0;
+            }
+
+            if (digitRe.test($password.value)) {
+                hasDigit = 1;
+            } else {
+                hasDigit = 0;
+            }
+
+            if (otherRe.test($password.value)) {
+                hasOther = 1;
+            } else {
+                hasOther = 0;
+            }
+
+            if ($password.value.length > 10) {
+                largeLength = 1;
+            } else {
+                largeLength = 0;
+            }
+
+            level = hasUpper + hasLower + hasDigit + largeLength + hasOther;
+
+            if ($password.value.length <= 5) {
+                if (level <= 2) {
+                    removeClass($pwdCheck, 'level2');
+                    removeClass($pwdCheck, 'level3');
+                    addClass($pwdCheck, 'level1');
+                } else if (level == 3 || level == 4) {
+                    removeClass($pwdCheck, 'level1');
+                    removeClass($pwdCheck, 'level3');
+                    addClass($pwdCheck, 'level2');
+                }
+            } else {
+                if (level <= 1) {
+                    removeClass($pwdCheck, 'level2');
+                    removeClass($pwdCheck, 'level3');
+                    addClass($pwdCheck, 'level1');
+                } else if (level == 2 || level == 3) {
+                    removeClass($pwdCheck, 'level1');
+                    removeClass($pwdCheck, 'level3');
+                    addClass($pwdCheck, 'level2');
+                } else if (level >= 4) {
+                    removeClass($pwdCheck, 'level1');
+                    removeClass($pwdCheck, 'level2');
+                    addClass($pwdCheck, 'level3');
+                }
+            }
+
+            pwdCheckOK = true;
+        }
+    }
+
+    function backPage() {
+        var $password = $("newPwd");
+        var $confirm = $('confirm');
+        var $pwdCheck = $('pwdCheck');
+
+        removeClass($pwdCheck, 'level1');
+        removeClass($pwdCheck, 'level2');
+        removeClass($pwdCheck, 'level3');
+        removeClass($password, "input-error");
+        removeClass($confirm, "input-error");
+
+        $password.value = "";
+        $confirm.value = "";
+        $("usrTips").style.display = "none";
+        $("pwdTips").style.display = "none";
+        $("errorTips").style.display = "inline";
+        $("login").style.display = "block";
+
+    }
+
+    function nextPage() {
+        var xmlHttpObj;
+
+        xmlHttpObj = getHttpObject(function() {
+            if (xmlHttpObj.status == 200) {
+                window.location.reload(true);
+            } else
+                return;
+        });
+        xmlHttpObj.open("POST", "http://" + window.location.hostname + "/cgi/setPwd?pwd=" + Base64Encoding("admin"), true);
+        xmlHttpObj.send(null);
+    }
+    </script>
+
+</head>
+
+<body onkeypress="PCWin(event)" onload="pageLoad()">
+    <div id="top">
+        <div id="topContainer">
+            <a id="topProduct" href="http://www.tp-link.com" target="_blank">
+                <span id="topProductName"></span>
+            </a>
+        </div>
+    </div>
+    <div id="scroll">
+        <div id="loginMain">
+            <div id='login' class="login-content">
+                <div class="login-field">
+                    <div class="inputarea">
+                        <input type="password" maxlength="15" id="newPwd" autocomplete="off" onblur="pwdBlur()" onfocus="pwdFocus();" onkeyup="checkPwd();">
+                        <label id="pwdLabel" for="newPwd" onfocus="pwdFocus();">New Password</label>
+                    </div>
+                    <div class="widget-error-tips user-tips" id="usrTips">
+                        <span class="widget-error-tips-delta"></span>
+                        <div class="widget-error-tips-wrap">
+                            <div class="content error-tips-content">
+                                <span id="tipsContentUsr"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="pwdCheck" class="secLevel" style="">
+                    <span class="level1 ori">Low</span>
+                    <span class="level2 ori">Middle</span>
+                    <span class="level3 ori">High</span>
+                </div>
+                <div class="login-field">
+                    <div class="inputarea">
+                        <input type="password" maxlength="15" id="confirm" autocomplete="off" onblur="cfmBlur()" onfocus="cfmFocus();">
+                        <label id="cfmLabel" for="confirm" onfocus="cfmFocus();">Confirm Password</label>
+                    </div>
+                    <div class="widget-error-tips pwd-tips" id="pwdTips">
+                        <span class="widget-error-tips-delta"></span>
+                        <div class="widget-error-tips-wrap">
+                            <div class="content error-tips-content">
+                                <span id="tipsContentPwd"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-btn">
+                    <button id="save-btn" class="button-button inline-block" type="button" onclick="PCSubWin()">
+                        <span class="text button-text">Save</span>
+                    </button>
+                </div>
+                <div class="widget-error-tips" id="errorTips">
+                    <span class="widget-error-tips-delta long"></span>
+                    <div class="widget-error-tips-wrap">
+                        <div class="content error-tips-content">
+                            <span id="errorContent"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="bottomContainer">
+            <div id="bottom"></div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -26,4 +26,15 @@ HappyFuck12345678
 of password lists, parses them, and routes your input through all of them. 
 2.1.1. graph db? (so as to interpolate hashes, regardless of algorithm?) 
 
-3. 
+3. use emacs-org-mode-export-to-html, to build an automated post-aurthoring system
+to push to the git repo 
+
+3.1 get hashcat ruinning on some gear 
+3.1.1 dir traversal
+3.1.2 Question: How does the TP-Link Tether App work?  
+
+3.1.2.1 (data) I know that there is an ssh host, that 
+acts as a local proxy for admining the router while away. 
+
+3.1.2.1.1 Question: can I build a tether-like app?  
+(that's essentially just what the website is) 

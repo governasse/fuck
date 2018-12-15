@@ -1,0 +1,1172 @@
+<script type="text/javascript">
+function init() {
+    initWireLess();
+    initSoftNAT();
+    /* initHardNAT();*/
+    initDDos();
+}
+
+/* wireless Settings */
+var wlanObj_2g,
+    wlanObj_5g,
+    wdsObj_2g,
+    wdsObj_5g;
+var flag = 0;
+
+function isHex(str) {
+    str = str.toLowerCase();
+    for (var i = 0; i < str.length; i++) {
+        if ((str.charAt(i) >= '0' && str.charAt(i) <= '9') || (str.charAt(i) >= 'a' && str.charAt(i) <= 'f'))
+            continue;
+        else {
+            $.alert(ERR_WLAN_WDS_HEX_KEY_INVALID);
+            return false;
+        }
+    }
+    if (parseInt(str, 16) == 0) {
+        $.alert(ERR_WLAN_WDS_HEX_KEY_OUTRANGE);
+        return false;
+    }
+    return true;
+}
+
+function checkValue(band) {
+    var bInt = $('#beaconInterval' + band);
+    var rtsInt = $('#rts' + band);
+    var fragTh = $('#frag' + band);
+    var dtimTh = $('#dtim' + band);
+    var ret;
+    if (ret = $.num(bInt.prop('value'), [200, 1000], true)) {
+        if (ret == ERR_NUM_INVAD) {
+            $.alert(ERR_WLAN_BEACONINTERVAL_INVAD);
+        } else if (ret == ERR_NUM_OUTRANGE) {
+            $.alert(ERR_WLAN_BEACONINTERVAL_OUTRANGE);
+        }
+        bInt.focus();
+        bInt.select();
+        return false;
+    }
+    if (ret = $.num(rtsInt.prop('value'), [1, 2346], true)) {
+        if (ret == ERR_NUM_INVAD) {
+            $.alert(ERR_WLAN_RTSINTERVAL_INVAD);
+        } else if (ret == ERR_NUM_OUTRANGE) {
+            $.alert(ERR_WLAN_RTSINTERVAL_OUTRANGE);
+        }
+        rtsInt.focus();
+        rtsInt.select();
+        return false;
+    }
+    if (ret = $.num(dtimTh.prop('value'), [1, 255], true)) {
+        if (ret == ERR_NUM_INVAD) {
+            $.alert(ERR_WLAN_DTIMTH_INVAD);
+        } else if (ret == ERR_NUM_OUTRANGE) {
+            $.alert(ERR_WLAN_DTIMTH_OUTRANGE);
+        }
+        dtimTh.focus();
+        dtimTh.select();
+        return false;
+    }
+    return true;
+}
+
+function initWireLess(argument) {
+    var basicList = $.act(ACT_GL, LAN_WLAN, null, null, ["name", "X_TP_Band", "X_TP_Configuration_Modified", "TransmitPowerSupported", "TransmitPower", "Standard", "X_TP_BeaconInterval", "X_TP_RTSThreshold", "X_TP_FragmentThreshold", "X_TP_DTIMFrequency", "X_TP_ShortGIEnable", "X_TP_IsolateClients", "WMMEnable", "X_TP_GroupKeyUpdateInterval", "SSID", "Channel", "AutoChannelEnable", "SSIDAdvertisementEnabled", "Enable", "X_TP_Bandwidth"]);
+
+    if (!$.exe()) {
+        $.each(basicList, function() {
+            if ("2.4GHz" == this.X_TP_Band) {
+                wlanObj_2g = this;
+            } else if (INCLUDE_LAN_WLAN_DUALBAND && "5GHz" == this.X_TP_Band) {
+                wlanObj_5g = this;
+            }
+        });
+
+        wdsObj_2g = $.act(ACT_GET, LAN_WLAN_WDSBRIDGE, wlanObj_2g.__stack, null, ["BridgeEnable", "BridgeAddrMode", "BridgeBSSID", "BridgeSSID", "BridgeAuthMode", "BridgeEncryptMode", "BridgeKey", "BridgeWepKeyIndex"]);
+        wdsObj_5g = $.act(ACT_GET, LAN_WLAN_WDSBRIDGE, wlanObj_5g.__stack, null, ["BridgeEnable", "BridgeAddrMode", "BridgeBSSID", "BridgeSSID", "BridgeAuthMode", "BridgeEncryptMode", "BridgeKey", "BridgeWepKeyIndex"]);
+    }
+
+    if (!$.exe()) {
+        initParam(wlanObj_2g, '_2g');
+        initParam(wlanObj_5g, '_5g');
+        initWDS(wlanObj_2g, wdsObj_2g, '_2g');
+        initWDS(wlanObj_5g, wdsObj_5g, '_5g');
+    }
+    flag = 1;
+
+    if ($.mainParam !== undefined) {
+        if(typeof($.mainParam.channel) != "undefined")
+            flag = 0;
+        var param = new Object();
+        param = $.mainParam;
+        $('#scroll').scrollTop(param.scrollTop);
+        if (param.band == "_5g") {
+            $('#wds_mode').find('span.second-mode').trigger('click');
+            $('#wds_mode').find('span').first().removeClass('mode-select').next().addClass('mode-select');
+        }
+
+        if (param.wdsExist == 1) {
+            $('#wdsSsid' + param.band).prop('value', param.SSID);
+            $('#wdsMac' + param.band).prop('value', param.BSSID);
+
+            if (param.channel != eval('wlanObj' + param.band).channel) {
+                $.confirm(n_str.wirelessAdv.t_confirm,
+                    function() {
+                        $.act(ACT_SET, LAN_WLAN, eval('wlanObj' + param.band).__stack, null, ['Channel=' + param.channel, "autoChannelEnable=0"]);
+                        $.showCover();
+                        $.exe(function(ret) {
+                            $.hideCover();
+                            if (!ret) {
+                                eval('wlanObj' + param.band).channel = param.channel;
+                                eval('wlanObj' + param.band).autoChannelEnable = 0;
+                                flag = 1;
+                            }
+                        });
+                    },
+                    null, param.channel);
+            }
+
+        }
+
+        if (param.wdsEn == 1) {
+            $('#wds' + param.band).prop('checked', true);
+            $('#wdsInfo' + param.band).show();
+        } else {
+            $('#wds' + param.band).prop('checked', false);
+            $('#wdsInfo' + param.band).hide();
+        }
+    }
+}
+
+function initParam(wlanObj, band) {
+    $('#beaconInterval' + band).prop('value', wlanObj.X_TP_BeaconInterval);
+    $('#rts' + band).prop('value', wlanObj.X_TP_RTSThreshold);
+    $('#frag' + band).prop('value', wlanObj.X_TP_FragmentThreshold);
+    $('#dtim' + band).prop('value', wlanObj.X_TP_DTIMFrequency);
+    $('#keyUpdate' + band).prop('value', wlanObj.X_TP_GroupKeyUpdateInterval);
+
+    $('#wmm' + band).prop('checked', wlanObj.WMMEnable == 1 ? true : false);
+    if ('n' == wlanObj.standard || 'n-only' == wlanObj.standard || 'gn' == wlanObj.standard || 'ac' == wlanObj.standard || 'an' == wlanObj.standard || 'nac' == wlanObj.standard || 'ac-only' == wlanObj.standard) {
+        $('#wmm' + band).prop('disabled', true);
+    }
+    $('#gi' + band).prop('checked', wlanObj.X_TP_ShortGIEnable == 1 ? true : false);
+    $('#apIso' + band).prop('checked', wlanObj.X_TP_IsolateClients == 1 ? true : false);
+}
+
+function initWDS(wlanObj, wdsObj, band) {
+    if (wlanObj.enable == 0) {
+        $('#wds' + band).prop('disabled', true);
+        $('#wds' + band).prop('checked', false);
+        $('#wdsInfo' + band).hide();
+        $('#wdsSave' + band).prop('disabled', true);
+        $.errorTip('wds' + band, ERR_WLAN_DISABLED);
+        return;
+    }
+    if (wdsObj.bridgeEnable == 1) {
+        $('#wdsInfo' + band).show();
+        $('#wds' + band).prop('checked', true);
+        $('#wdsSsid' + band).prop('value', wdsObj.bridgeSSID);
+        $('#wdsMac' + band).prop('value', wdsObj.bridgeBSSID);
+
+        if (wdsObj.bridgeAuthMode == "Open" && wdsObj.bridgeEncryptMode == "None") {
+            $('#noSec' + band).prop('checked', true);
+        } else if (wdsObj.bridgeEncryptMode == "WEPEncryption") {
+
+            $('#wepSec' + band).prop('checked', true);
+
+            if (wdsObj.bridgeAuthMode == "SharedAuthentication") {
+                $('#typeSharedKey' + band).prop('checked', true);
+            } else if (wdsObj.bridgeAuthMode = "Open") {
+                $('#typeOpenSys' + band).prop('checked', true);
+            }
+
+            $('#wepKeyValue' + band).prop('value', wdsObj.bridgeKey);
+
+            if (wdsObj.bridgeKey.length == 5 || wdsObj.bridgeKey.length == 13 || wdsObj.bridgeKey.length == 16) {
+                $('#keyFormatAscii' + band).prop('checked', true);
+            } else if (wdsObj.bridgeKey.length == 10 || wdsObj.bridgeKey.length == 26 || wdsObj.bridgeKey.length == 32) {
+                $('#keyFormatHex' + band).prop('checked', true);
+            }
+
+            $('#key' + wdsObj.bridgeWepKeyIndex + band).prop('selected', true);
+        } else {
+            $('#wpaSec' + band).prop('checked', true);
+
+            if (wdsObj.bridgeAuthMode == "PSKAuthentication")
+                $('#wpaVersion' + band).prop('checked', true);
+            else
+                $('#wpa2Version' + band).prop('checked', true);
+
+            if (wdsObj.bridgeEncryptMode == "TKIPEncryption")
+                $('#tkipEncryption' + band).prop('checked', true);
+            else
+                $('#aesEncryption' + band).prop('checked', true);
+
+            $('#passwd' + band).prop('value', wdsObj.bridgeKey)
+        }
+
+    } else {
+        $('#wds' + band).prop('checked', false);
+        $('#wdsInfo' + band).hide();
+    }
+}
+
+
+function wlAdvSave(wlanObj, band) {
+    var param = {};
+
+    param.X_TP_BeaconInterval = $('#beaconInterval' + band).prop('value');
+    param.X_TP_RTSThreshold = $('#rts' + band).prop('value');
+    param.X_TP_FragmentThreshold = $('#frag' + band).prop('value');
+    param.X_TP_DTIMFrequency = $('#dtim' + band).prop('value');
+    param.X_TP_GroupKeyUpdateInterval = $('#keyUpdate' + band).prop('value');
+    param.WMMEnable = $('#wmm' + band).prop('data-checked') ? 1 : 0;
+    param.X_TP_ShortGIEnable = $('#gi' + band).prop('data-checked') ? 1 : 0;
+    param.X_TP_IsolateClients = $('#apIso' + band).prop('data-checked') ? 1 : 0;
+
+    $.act(ACT_SET, LAN_WLAN, wlanObj.__stack, null, param);
+
+    if (INCLUDE_LAN_WLAN_MSSID) {
+        var vapList = $.act(ACT_GS, LAN_WLAN_MSSIDENTRY, null, wlanObj.__stack, ["IsolateClients", "name"]);
+        if (INCLUDE_LAN_WLAN_GUESTNETWORK) {
+            var guestObj = $.act(ACT_GET, LAN_WLAN_GUESTNET, wlanObj.__stack, null, ["name"]);
+        }
+        $.exe(function(ret) {
+            if (!ret) {
+                $.each(vapList, function(arg, index) {
+                    if (INCLUDE_LAN_WLAN_GUESTNETWORK && (guestObj.name == this.name)) {;
+                    } else {
+                        $.act(ACT_SET, LAN_WLAN_MSSIDENTRY, this.__stack, null, ["IsolateClients=" + param.X_TP_IsolateClients]);
+                    }
+                });
+                $.exe(function(ret) {
+                    $.removeLoading();
+                });
+            }
+        });
+    } else {
+        $.exe(function(ret) {
+            $.removeLoading();
+        });
+    }
+}
+
+function checkWds(wdsObj, band) {
+    var ssidLen = $.realLen($('#wdsSsid' + band).prop('value'));
+    if (ssidLen <= 0) {
+        $.alert(ERR_WLAN_WDS_SSID_IS_EMPTY);
+        $('#wdsSsid' + band).focus().select();
+        return false;
+    } else if (ssidLen > 32) {
+        $.alert(ERR_WLAN_WDS_SSID_LEN_OUTRANGE);
+        $('#wdsSsid' + band).focus().select();
+        return false;
+    }
+    var bssid = $("#wdsMac" + band).prop('value');
+    if (bssid.length == 0) {
+        $.alert(ERR_WLAN_WDS_BSSID_IS_EMPTY);
+        $("#wdsMac" + band).focus().select();
+        return false;
+    } else if ($.mac(bssid, true)) {
+        $.alert(ERR_WLAN_WDS_BSSID_INVALID);
+        $("#wdsMac" + band).focus().select();
+        return false;
+    }
+    if ($('#wepSec' + band).prop('checked') == true) {
+        var wepKey = $('#wepKeyValue' + band).prop('value');
+        if ($('#keyFormatAscii' + band).prop('checked') == true) {
+            if (wepKey.length != 5 && wepKey.length != 13 && wepKey.length != 16) {
+                $.alert(ERR_WLAN_WDS_ASCII_KEY_OUTRANGE);
+                return false;
+            } else if ($.asc(wepKey, true)) {
+                $.alert(ERR_WLAN_WDS_ASCII_KEY_INVALID);
+                return false;
+            }
+        } else if ($('#keyFormatHex' + band).prop('checked') == true) {
+            if (wepKey.length != 10 && wepKey.length != 26 && wepKey.length != 32) {
+                $.alert(ERR_WLAN_WDS_HEX_KEY_OUTRANGE);
+                return false;
+            } else if (!isHex(wepKey)) {
+                return false;
+            }
+        }
+    } else if ($('#wpaSec' + band).prop('checked') == true) {
+        var wpaKey = $('#passwd' + band).prop('value');
+        if (wpaKey.length > 64 || wpaKey.length < 8) {
+            $.alert(ERR_WLAN_WDS_PSK_OUTRANGE);
+            return false;
+        } else if (wpaKey.length == 64) {
+            if (!isHex(wpaKey)) {
+                return false;
+            }
+        } else {
+            if ($.asc(wpaKey, true)) {
+                $.alert(ERR_WLAN_WDS_ASCII_KEY_INVALID);
+                return false;
+            }
+        }
+    }
+
+    if ($.mainParam != null && $.mainParam.wdsExist == 1 && ($.mainParam.band == band && $.mainParam.channel != eval('wlanObj' + band).channel)) {
+        $.alert(ERR_WLAN_WDS_CHANNEL, $.mainParam.channel);
+        return false;
+    }
+
+    return true
+}
+
+function wdsSave(wdsObj, band) {
+    var wdsEn, authMode, encryptMode, pwd;
+    wdsEn = $('#wds' + band).prop('data-checked') ? 1 : 0;
+    if ($('#noSec' + band).prop('checked') == true) {
+        authMode = 'Open';
+        encryptMode = 'None'
+        pwd = '';
+    } else if ($('#wepSec' + band).prop('checked') == true) {
+        encryptMode = 'WEPEncryption';
+        if ($('#typeOpenSys' + band).prop('checked') == true)
+            authMode = 'Open';
+        else if ($('#typeSharedKey' + band).prop('checked') == true)
+            authMode = 'SharedAuthentication';
+        pwd = $('#wepKeyValue' + band).prop('value');
+    } else if ($('#wpaSec' + band).prop('checked') == true) {
+        if ($('#wpaVersion' + band).prop('checked') == true) {
+            authMode = 'PSKAuthentication';
+        } else if ($('#wpa2Version' + band).prop('checked') == true) {
+            authMode = 'PSK2Authentication';
+        }
+        if ($('#tkipEncryption' + band).prop('checked') == true)
+            encryptMode = 'TKIPEncryption';
+        else if ($('#aesEncryption' + band).prop('checked') == true)
+            encryptMode = 'AESEncryption';
+        pwd = $('#passwd' + band).prop('value');
+    }
+    if (wdsEn == 1) {
+        if(!flag){
+            if(eval('wlanObj' + $.mainParam.band).autoChannelEnable){
+                $.act(ACT_SET, LAN_WLAN, eval('wlanObj' + $.mainParam.band).__stack, null, ['Channel=' + $.mainParam.channel, "autoChannelEnable=0"]);
+            }
+        }
+        else
+        {
+            if(eval('wlanObj' + band).autoChannelEnable)
+            {
+                $.act(ACT_SET, LAN_WLAN, eval('wlanObj' + band).__stack, null, ['Channel=' + eval('wlanObj' + band).channel, "autoChannelEnable=0"]);
+            }
+        }
+        $.act(ACT_SET, LAN_WLAN_WDSBRIDGE, wdsObj.__stack, null, ["BridgeEnable=" + wdsEn,
+            "BridgeBSSID=" + $('#wdsMac' + band).prop('value'),
+            "BridgeSSID=" + $('#wdsSsid' + band).prop('value'),
+            "BridgeAuthMode=" + authMode,
+            "BridgeEncryptMode=" + encryptMode,
+            "BridgeKey=" + pwd,
+            "BridgeWepKeyIndex=" + $("#wepShareKey" + band).data('value')
+        ]);
+    } else {
+        $.act(ACT_SET, LAN_WLAN_WDSBRIDGE, wdsObj.__stack, null, ["BridgeEnable=" + wdsEn]);
+    }
+    flag = 1;
+    $.exe(function() {
+        /* $.removeLoading();*/
+    });
+}
+
+function surveyAp(wlanObj, band) {
+    $.act(ACT_OP, ACT_OP_WLAN_SCAN, wlanObj.__stack);
+    var param = {};
+    param.wdsEn = $('#wds' + band).prop('data-checked') ? 1 : 0;
+    param.scrollTop = $('#scroll').scrollTop();
+    $.exe(function(ret) {
+        $.removeLoading();
+        if (!ret) {
+            if (band == '_2g') {
+                $.loadMain("wlScan_2G.htm", param);
+            } else {
+                $.loadMain("wlScan_5G.htm", param);
+            }
+        }
+    });
+}
+
+
+$('#wds_2g').on('click.wlAdv', function(e) {
+    if ($('#wds_2g').prop('data-checked')) {
+        $('#wdsInfo_2g').show('fast');
+    } else {
+        $('#wdsInfo_2g').hide('fast');
+    }
+});
+$('#wds_5g').on('click.wlAdv', function(e) {
+    if ($('#wds_5g').prop('data-checked')) {
+        $('#wdsInfo_5g').show('fast');
+    } else {
+        $('#wdsInfo_5g').hide('fast');
+    }
+});
+$('#wlAdvSave_2g').on('click.wlAdv', function(e) {
+    /* check value */
+    var band = "_2g";
+    if (checkValue(band) == false) {
+        return false;
+    }
+
+    if ($('#wds' + band).prop('data-checked') == true && checkWds(wdsObj_2g, band) == false) {
+        return false;
+    }
+
+    $.addLoading($(this));
+    wdsSave(wdsObj_2g, '_2g');
+    wlAdvSave(wlanObj_2g, '_2g');
+
+});
+$('#wlAdvSave_5g').on('click.wlAdv', function(e) {
+    /* check value */
+    var band = "_5g";
+    if (checkValue(band) == false) {
+        return false;
+    }
+
+    if ($('#wds' + band).prop('data-checked') == true && checkWds(wdsObj_5g, band) == false) {
+        return false;
+    }
+
+    $.addLoading($(this));
+    wdsSave(wdsObj_5g, '_5g');
+    wlAdvSave(wlanObj_5g, '_5g');
+
+});
+
+$('#noSec_2g').on('click.wlAdv', function(e) {
+    $('#hideWpaSec_2g').hide('fast');
+    $('#hideWep_2g').hide('fast');
+});
+$('#noSec_5g').on('click.wlAdv', function(e) {
+    $('#hideWpaSec_5g').hide('fast');
+    $('#hideWep_5g').hide('fast');
+});
+$('#wpaSec_2g').on('click.wlAdv', function(e) {
+    $('#hideWpaSec_2g').show('fast');
+    $('#hideWep_2g').hide('fast');
+});
+$('#wpaSec_5g').on('click.wlAdv', function(e) {
+    $('#hideWpaSec_5g').show('fast');
+    $('#hideWep_5g').hide('fast');
+});
+$('#wepSec_2g').on('click.wlAdv', function(e) {
+    $('#hideWpaSec_2g').hide('fast');
+    $('#hideWep_2g').show('fast');
+});
+$('#wepSec_5g').on('click.wlAdv', function(e) {
+    $('#hideWpaSec_5g').hide('fast');
+    $('#hideWep_5g').show('fast');
+});
+$('#survey_2g').on('click.wlAdv', function(e) {
+    $.addLoading($(this));
+    surveyAp(wlanObj_2g, '_2g');
+});
+$('#survey_5g').on('click.wlAdv', function(e) {
+    $.addLoading($(this));
+    surveyAp(wlanObj_5g, '_5g');
+});
+
+
+/* NAT Part */
+var hwNat;
+var wan_iplist_sta = {};
+var wan_iplist_dyn = {};
+var wan_bpa_list = {};
+var wan_pppoelist = {};
+var wan_l2tp_list = {};
+var wan_pptp_list = {};
+var staticStk;
+var dynStk;
+var bpaStk;
+var PPPoEStk;
+var l2tpStk;
+var pptpStk;
+var pStk;
+var type = "";
+
+function initSoftNAT() {
+    if (INCLUDE_IPV6) {
+        if (INCLUDE_BPA) {
+            var wanIPv4ListAll = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable", "addressingType", "X_TP_IPv4Enabled", "X_TP_BpaEnable"]);
+        } else {
+            var wanIPv4ListAll = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable", "addressingType", "X_TP_IPv4Enabled"]);
+        }
+
+        var wanPPPv4ListAll = $.act(ACT_GL, WAN_PPP_CONN, null, null, ["enable", "transportType", "X_TP_IPv4Enabled"]);
+        var wanIPList = {};
+        var wanPPPList = {};
+        var wanIndex = 0;
+
+        if (!$.exe()) {
+            $.each(wanIPv4ListAll, function() {
+                if (this.X_TP_IPv4Enabled == 1) {
+                    wanIPList[wanIndex] = this;
+                    wanIndex++;
+                }
+            });
+
+            wanIndex = 0;
+            $.each(wanPPPv4ListAll, function() {
+                if (this.X_TP_IPv4Enabled == 1) {
+                    wanPPPList[wanIndex] = this;
+                    wanIndex++;
+                }
+            });
+        }
+    } else {
+        if (INCLUDE_BPA){
+           var wanIPList = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable", "addressingType", "X_TP_BpaEnable"]); 
+       } else {
+           var wanIPList = $.act(ACT_GL, WAN_IP_CONN, null, null, ["enable", "addressingType"]);
+       } 
+
+        var wanPPPList = $.act(ACT_GL, WAN_PPP_CONN, null, null, ["enable", "transportType"]);
+    }
+    if (INCLUDE_L2TP) {
+        var wanL2tpList = $.act(ACT_GL, WAN_L2TP_CONN, null, null, ["enable", "addressingType", "transportType"]);
+    }
+    if (INCLUDE_PPTP) {
+        var wanPptpList = $.act(ACT_GL, WAN_PPTP_CONN, null, null, ["enable", "addressingType", "transportType"]);
+    }
+    var wanTypes = $.act(ACT_GL, WAN_COMMON_INTF_CFG, null, null, ["WANAccessType"]);
+
+    if (!$.exe()) {
+        $.each(wanTypes, function() {
+            if (this.WANAccessType == "Ethernet")
+                pStk = this.__stack;
+        });
+        var ethWan = $.act(ACT_GET, WAN_ETH_INTF, pStk, null, ["enable", "X_TP_lastUsedIntf"]);
+        $.each(wanIPList, function() {
+            var tmpStk = $.stkPop(this.__stack, 2);
+            if (pStk == tmpStk) {
+                if (this.addressingType == "Static") {
+                    staticStk = this.__stack;
+                    wan_iplist_sta = $.act(ACT_GET, WAN_IP_CONN, this.__stack, null, null);
+                }
+                
+                if (this.addressingType == "DHCP" && this.X_TP_BpaEnable != 1) {
+                    dynStk = this.__stack;
+                    wan_iplist_dyn = $.act(ACT_GET, WAN_IP_CONN, this.__stack, null, null);
+                }
+
+                if (INCLUDE_BPA && this.X_TP_BpaEnable == 1) {
+                    bpaStk = this.__stack;
+                    wan_bpa_list = $.act(ACT_GET, WAN_IP_CONN, this.__stack, null, null);
+                }
+
+                if ((this.enable == 1) && (this.addressingType == "Static"))
+                    type = "staticIp";
+                else if ((this.enable == 1) && (this.addressingType == "DHCP") && (this.X_TP_BpaEnable == 0))
+                    type = "dynamicIp";
+                else if (INCLUDE_BPA && (this.enable == 1) && (this.X_TP_BpaEnable == 1))
+                    type = "bpa";
+
+            }
+        });
+        $.each(wanPPPList, function() {
+            var tmpStk = $.stkPop(this.__stack, 2);
+            if (pStk == tmpStk) {
+                if (this.transportType == "PPPoE") {
+                    PPPoEStk = this.__stack;
+                    wan_pppoelist = $.act(ACT_GET, WAN_PPP_CONN, this.__stack, null, null);
+                }
+                if ((this.enable == 1) && (this.transportType == "PPPoE"))
+                    type = "pppoe";
+            }
+        });
+        if (INCLUDE_L2TP) {
+            $.each(wanL2tpList, function() {
+                var tmpStk = $.stkPop(this.__stack, 1);
+                if (pStk == tmpStk) {
+                    l2tpStk = this.__stack;
+                    wan_l2tp_list = $.act(ACT_GET, WAN_L2TP_CONN, this.__stack, null, null);
+                    if (this.enable == 1) {
+                        type = "l2tp";
+                    }
+                }
+
+            });
+        }
+        if (INCLUDE_PPTP) {
+            $.each(wanPptpList, function() {
+                var tmpStk = $.stkPop(this.__stack, 1);
+                if (pStk == tmpStk) {
+                    pptpStk = this.__stack;
+                    wan_pptp_list = $.act(ACT_GET, WAN_PPTP_CONN, this.__stack, null, null);
+                    if (this.enable == 1) {
+                        type = "pptp";
+                    }
+                }
+            });
+        }
+        if (!$.exe()) {
+            if (type == "staticIp") {
+                if (wan_iplist_sta.NATEnabled == 1) {
+                    $("#enable_nat").prop("checked", true);
+                } else if (wan_iplist_sta.NATEnabled == 0) {
+                    $("#enable_nat").prop("checked", false);
+                }
+            } else if (type == "dynamicIp") {
+                if (wan_iplist_dyn.NATEnabled == 1) {
+                    $("#enable_nat").prop("checked", true);
+                } else if (wan_iplist_dyn.NATEnabled == 0) {
+                    $("#enable_nat").prop("checked", false);
+                }
+            } else if (type == "bpa") {
+                if (wan_bpa_list.NATEnabled == 1) {
+                    $("#enable_nat").prop("checked", true);
+                } else if (wan_bpa_list.NATEnabled == 0) {
+                    $("#enable_nat").prop("checked", false);
+                }
+            } else if (type == "pppoe") {
+                if (wan_pppoelist.NATEnabled == 1) {
+                    $("#enable_nat").prop("checked", true);
+                } else if (wan_pppoelist.NATEnabled == 0) {
+                    $("#enable_nat").prop("checked", false);
+                }
+            } else if (type == "l2tp") {
+                if (wan_l2tp_list.NATEnabled == 1) {
+                    $("#enable_nat").prop("checked", true);
+                } else if (wan_l2tp_list.NATEnabled == 0) {
+                    $("#enable_nat").prop("checked", false);
+                }
+            } else if (type == "pptp") {
+                if (wan_pptp_list.NATEnabled == 1) {
+                    $("#enable_nat").prop("checked", true);
+                } else if (wan_pptp_list.NATEnabled == 0) {
+                    $("#enable_nat").prop("checked", false);
+                }
+            }
+        }
+    }
+}
+
+function initHardNAT() {
+    hwNat = $.act(ACT_GET, ALG_CFG, null, null);
+    var tcEntry = $.act(ACT_GET, TC, null, null);
+    var statCfg = $.act(ACT_GET, STAT_CFG, null, null);
+
+    
+    if (!$.exe()) {
+        /*hwnat and tc && statCfg can not open at same time */
+
+        if (tcEntry.enable != 0 || statCfg.enable == 1){
+            $("#enable_hw_nat").prop("disabled", true);
+            $.errorTip('enable_hw_nat', ERR_HW_NAT_DISABLED);
+        }
+
+        if (hwNat.hw_nat_enable == 1) {
+            $("#enable_hw_nat").prop("checked", true);
+        } else {
+            $("#enable_hw_nat").prop("checked", false);
+        }
+    }
+}
+
+function doNatSave(obj) {
+    $.addLoading(obj);
+    var NATEnable = ($("#enable_nat").prop("data-checked") ? 1 : 0);
+
+    $.act(ACT_SET, WAN_IP_CONN, staticStk, null, ["NATEnabled=" + NATEnable]);
+
+    $.act(ACT_SET, WAN_IP_CONN, dynStk, null, ["NATEnabled=" + NATEnable]);
+
+    $.act(ACT_SET, WAN_IP_CONN, bpaStk, null, ["NATEnabled=" + NATEnable]);
+
+    $.act(ACT_SET, WAN_PPP_CONN, PPPoEStk, null, ["NATEnabled=" + NATEnable]);
+
+    $.act(ACT_SET, WAN_L2TP_CONN, l2tpStk, null, ["NATEnabled=" + NATEnable]);
+
+    $.act(ACT_SET, WAN_PPTP_CONN, pptpStk, null, ["NATEnabled=" + NATEnable]);
+
+    /*
+    hwNat.hw_nat_enable = ($("#enable_hw_nat").prop("data-checked") == true) ? 1 : 0;
+    $.act(ACT_SET, ALG_CFG, null, null, hwNat);
+    */
+    $.exe(function(err) {
+        if (!err) $.reload();
+    });
+}
+
+$('#natSave').on('click.wlAdv', function(e) {
+    doNatSave();
+});
+
+/* Dos Level */
+$("#ddosSave").click(function() {
+    $.addLoading($(this));
+    doSaveDosProtectionLevelSettings();
+});
+
+function doSaveDosProtectionLevelSettings() {
+    var ddosArg = {};
+
+    ddosArg.icmpLevelLow = $("#icmpLow").children("input").val();
+    ddosArg.icmpLevelMiddle = $("#icmpMiddle").children("input").val();
+    ddosArg.icmpLevelHigh = $("#icmpHigh").children("input").val();
+
+    ddosArg.udpLevelLow = $("#udpLow").children("input").val();
+    ddosArg.udpLevelMiddle = $("#udpMiddle").children("input").val();
+    ddosArg.udpLevelHigh = $("#udpHigh").children("input").val();
+
+    ddosArg.synLevelLow = $("#tcpLow").children("input").val();
+    ddosArg.synLevelMiddle = $("#tcpMiddle").children("input").val();
+    ddosArg.synLevelHigh = $("#tcpHigh").children("input").val();
+
+    $.act(ACT_SET, DDOS_CFG, null, null, ddosArg);
+
+    $.exe(function(ret) {
+        $.removeLoading();
+        if (!ret) {
+            $.reload();
+        }
+    });
+}
+
+function initDDos() {
+
+    hostStack = [];
+
+    var icmpMin = 5;
+    var icmpLow = $("#icmpLow").children("input").val();
+    var icmpMiddle = $("#icmpMiddle").children("input").val();
+    var icmpHigh = $("#icmpHigh").children("input").val();
+    var icmpMax = 3600;
+
+    var udpMin = 5;
+    var udpLow = $("#udpLow").children("input").val();
+    var udpMiddle = $("#udpMiddle").children("input").val();
+    var udpHigh = $("#udpHigh").children("input").val();
+    var udpMax = 3600;
+
+    var tcpMin = 5;
+    var tcpLow = $("#tcpLow").children("input").val();
+    var tcpMiddle = $("#tcpMiddle").children("input").val();
+    var tcpHigh = $("#tcpHigh").children("input").val();
+    var tcpMax = 3600;
+
+    var ddosCfg = $.act(ACT_GET, DDOS_CFG, null, null);
+
+    if (!$.exe()) {
+        icmpLow = ddosCfg.icmpLevelLow;
+        icmpMiddle = ddosCfg.icmpLevelMiddle;
+        icmpHigh = ddosCfg.icmpLevelHigh;
+
+        udpLow = ddosCfg.udpLevelLow;
+        udpMiddle = ddosCfg.udpLevelMiddle;
+        udpHigh = ddosCfg.udpLevelHigh;
+
+        tcpLow = ddosCfg.synLevelLow;
+        tcpMiddle = ddosCfg.synLevelMiddle;
+        tcpHigh = ddosCfg.synLevelHigh;
+
+        $("#icmpLow").children("input").val(icmpLow);
+        $("#icmpMiddle").children("input").val(icmpMiddle);
+        $("#icmpHigh").children("input").val(icmpHigh);
+
+        $("#udpLow").children("input").val(udpLow);
+        $("#udpMiddle").children("input").val(udpMiddle);
+        $("#udpHigh").children("input").val(udpHigh);
+
+        $("#tcpLow").children("input").val(tcpLow);
+        $("#tcpMiddle").children("input").val(tcpMiddle);
+        $("#tcpHigh").children("input").val(tcpHigh);
+    }
+}
+
+</script>
+<html>
+
+<head>
+    <style type="text/css">
+    td.notice {
+        vertical-align:top;
+        width:230px;
+        margin:0px;
+        text-align: left;
+        padding-top:15px
+    }
+    label.notice_lbl {
+        padding-top:5px;
+    }
+    td.value {
+        text-align: left;
+    }
+    </style>
+</head>
+
+<body>
+    <h3 id="et_2g_adv">wireless 2.4ghz</h3>
+    <div class="content-container">
+        <!-- wireless 2.4Ghz -->
+        <form class="pure-form pure-form-aligned">
+            
+            <div class="pure-control-group">
+                <b class="xxl" id="t_beacon_2g">Beacon Interval:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="beaconInterval_2g" />
+                <span class="textbox-tips">(200-1000)</span>
+            </div>
+            <div class="pure-control-group">
+                <b class="xxl" id="t_rts_2g">RTS Threshold:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="rts_2g" />
+                <span class="textbox-tips">(1-2346)</span>
+            </div>
+            <div class="pure-control-group nd">
+                <b class="xxl" id="t_frag_2g">Fragmentation Threshold:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="frag_2g" />
+                <span class="textbox-tips">(256-2346)</span>
+            </div>
+            <div class="pure-control-group">
+                <b class="xxl" id="t_dtim_2g">DTIM Interval:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="dtim_2g" />
+                <span class="textbox-tips">(1-255)</span>
+            </div>
+            <div class="pure-control-group">
+                <b class="xxl" id="t_time_2g">Group Key Update Period:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="keyUpdate_2g" />
+                <span class="textbox-tips T_seconds">seconds</span>
+            </div>
+            <div class="part-separate">
+                <b class="xxl" id="t_wmm_2g">WMM Feature:</b>
+                <input type="checkbox" id="wmm_2g" />
+                <label id="t_enwmm_2g">Enable WMM</label>
+            </div>
+            <div>
+                <b class="xxl" id="t_sgi_2g">Short GI Feature:</b>
+                <input type="checkbox" id="gi_2g" />
+                <label id="t_ensgi_2g">Enable Short GI</label>
+            </div>
+            <div>
+                <b class="xxl" id="t_iso_2g">AP Isolation Feature:</b>
+                <input type="checkbox" id="apIso_2g" />
+                <label id="t_eniso_2g">Enable AP Isolation</label>
+            </div>
+            <br/>
+
+            <div>
+                <b id="t_wds_2g" class="xxl">WDS Bridging:</b>
+                <input type="checkbox" id="wds_2g" />
+                <label id="t_enwds_2g">Enable WDS Bridging</label>
+            </div>
+            <div id="wdsInfo_2g">
+                <div class="pure-control-group inline">
+                    <b class="T_wlname xxl">Name(SSID):</b>
+                    <input type="text" maxlength="32" class="tp-input-text" id="wdsSsid_2g" />
+                </div>
+                <button type="submit" class="blue inline T_survey" id="survey_2g">Survey</button>
+                <div class="pure-control-group">
+                    <b id="t_mac_2g" class="xxl">MAC Address(to be bridged):</b>
+                    <input type="text" maxlength="17" class="tp-input-text" id="wdsMac_2g" />
+                </div>
+                <div>
+                    <b class="T_wlsec xxl">Security:</b>
+                    <input type="radio" name="security_2g" id="noSec_2g" checked="checked" />
+                    <label class="T_wldissec">No Security</label>
+                    <input type="radio" name="security_2g" id="wpaSec_2g" />
+                    <label class="T_wlsecpersonal">WPA/WPA2 Personal</label>
+                    <input type="radio" name="security_2g" id="wepSec_2g" />
+                    <label>WEP</label>
+                </div>
+                <div id="hideWpaSec_2g" class="nd">
+                    <div>
+                        <b class="T_version xxl">Version:</b>
+                        <input type="radio" name="version_2g" id="wpaVersion_2g" />
+                        <label>WPA-PSK</label>
+                        <input type="radio" name="version_2g" id="wpa2Version_2g" checked="checked" />
+                        <label>WPA2-PSK</label>
+                    </div>
+
+                    <div>
+                        <b class="T_encryption xxl">Encryption:</b>
+                        <input type="radio" name="encryption_2g" id="tkipEncryption_2g" />
+                        <label>TKIP</label>
+                        <input type="radio" name="encryption_2g" id="aesEncryption_2g" checked="checked" />
+                        <label>AES</label>
+                    </div>
+                    <div class="pure-control-group">
+                        <b class="T_wlpwd xxl">Wireless Password:</b>
+                        <input type="text" class="tp-input-text" id="passwd_2g" />
+                    </div>
+                </div>
+                <div id="hideWep_2g" class="">
+                    <div>
+                        <b class="T_type xxl">Type:</b>
+                        <input type="radio" name="wepType_2g" id="typeOpenSys_2g" checked="checked" />
+                        <label class="T_opensys">Open System</label>
+                        <input type="radio" name="wepType_2g" id="typeSharedKey_2g" />
+                        <label class="T_sharekey">Shared Key</label>
+                    </div>
+                    <div>
+                        <b class="T_weptype xxl">Key Format:</b>
+                        <input type="radio" name="keyFormat_2g" id="keyFormatAscii_2g" checked="checked" />
+                        <label>ASCII</label>
+                        <input type="radio" name="keyFormat_2g" id="keyFormatHex_2g" />
+                        <label class="T_hex">Hexadecimal</label>
+                    </div>
+                    <b class="T_wepkeyindex xxl">Key Index:</b>
+                    <select id="wepShareKey_2g" class="xl">
+                        <option value="1" id="key1_2g">Key 1</option>
+                        <option value="2" id="key2_2g">Key 2</option>
+                        <option value="3" id="key3_2g">key 3</option>
+                        <option value="4" id="key4_2g">Key 4</option>
+                    </select>
+                    <div>
+                        <b class="T_keyvalue xxl">Key Value:</b>
+                        <input type="text" class="tp-input-text xl" name="wepKeyValue_2g" id="wepKeyValue_2g" />
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="green T_save" id="wlAdvSave_2g">Save</button>
+        </form>
+        <br/>
+        <!-- wireless 5Ghz -->
+        <form class="pure-form pure-form-aligned">
+            <h3 id="et_5g_adv">wireless 5ghz</h3>
+            <div class="pure-control-group">
+                <b class="xxl" id="t_beacon_5g">Beacon Interval:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="beaconInterval_5g" />
+                <span class="textbox-tips">(200-1000)</span>
+            </div>
+            <div class="pure-control-group">
+                <b class="xxl" id="t_rts_5g">RTS Threshold:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="rts_5g" />
+                <span class="textbox-tips">(1-2346)</span>
+            </div>
+            <div class="pure-control-group nd">
+                <b class="xxl" id="t_frag_5g">Fragmentation Threshold:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="frag_5g" />
+                <span class="textbox-tips">(256-2346)</span>
+            </div>
+            <div class="pure-control-group">
+                <b class="xxl" id="t_dtim_5g">DTIM Interval:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="dtim_5g" />
+                <span class="textbox-tips">(1-255)</span>
+            </div>
+            <div class="pure-control-group">
+                <b class="xxl" id="t_time_5g">Group Key Update Period:</b>
+                <input type="text" maxlength="4" class="tp-input-text" id="keyUpdate_5g" />
+                <span class="textbox-tips T_seconds">seconds</span>
+            </div>
+            <div class="part-separate">
+                <b class="xxl" id="t_wmm_5g">WMM Feature:</b>
+                <input type="checkbox" id="wmm_5g" />
+                <label id="t_enwmm_5g">Enable WMM</label>
+            </div>
+            <div>
+                <b class="xxl" id="t_sgi_5g">Short GI Feature:</b>
+                <input type="checkbox" id="gi_5g" />
+                <label id="t_ensgi_5g">Enable Short GI</label>
+            </div>
+            <div>
+                <b class="xxl" id="t_iso_5g">AP Isolation Feature:</b>
+                <input type="checkbox" id="apIso_5g" />
+                <label id="t_eniso_5g">Enable AP Isolation</label>
+            </div>
+            <br/>
+            <div>
+                <b id="t_wds_5g" class="xxl">WDS Bridging:</b>
+                <input type="checkbox" id="wds_5g" />
+                <label id="t_enwds_5g">Enable WDS Bridging</label>
+            </div>
+            <div id="wdsInfo_5g">
+                <div class="pure-control-group inline">
+                    <b class="T_wlname xxl">Name(SSID):</b>
+                    <input type="text" maxlength="32" class="tp-input-text" id="wdsSsid_5g" />
+                </div>
+                <button type="submit" class="blue inline T_survey" id="survey_5g">Survey</button>
+                <div class="pure-control-group">
+                    <b id="t_mac_5g" class="xxl">MAC Address(to be bridged):</b>
+                    <input type="text" maxlength="17" class="tp-input-text" id="wdsMac_5g" />
+                </div>
+                <div>
+                    <b class="T_wlsec xxl">Security:</b>
+                    <input type="radio" name="security_5g" id="noSec_5g" checked="checked" />
+                    <label class="T_wldissec">No Security</label>
+                    <input type="radio" name="security_5g" id="wpaSec_5g" />
+                    <label class="T_wlsecpersonal">WPA/WPA2 Personal</label>
+                    <input type="radio" name="security_5g" id="wepSec_5g" />
+                    <label>WEP</label>
+                </div>
+                <div id="hideWpaSec_5g" class="nd">
+                    <div>
+                        <b class="T_version xxl">Version:</b>
+                        <input type="radio" name="version_5g" id="wpaVersion_5g" />
+                        <label>WPA-PSK</label>
+                        <input type="radio" name="version_5g" id="wpa2Version_5g" checked="checked" />
+                        <label>WPA2-PSK</label>
+                    </div>
+
+                    <div>
+                        <b class="T_encryption xxl">Encryption:</b>
+                        <input type="radio" name="encryption_5g" id="tkipEncryption_5g" />
+                        <label>TKIP</label>
+                        <input type="radio" name="encryption_5g" id="aesEncryption_5g" checked="checked" />
+                        <label>AES</label>
+                    </div>
+                    <div class="pure-control-group">
+                        <b class="T_wlpwd xxl">Wireless Password:</b>
+                        <input type="text" class="tp-input-text" id="passwd_5g" />
+                    </div>
+                </div>
+                <div id="hideWep_5g" class="">
+                    <div>
+                        <b class="T_type xxl">Type:</b>
+                        <input type="radio" name="wepType_5g" id="typeOpenSys_5g" checked="checked" />
+                        <label class="T_opensys">Open System</label>
+                        <input type="radio" name="wepType_5g" id="typeSharedKey_5g" />
+                        <label class="T_sharekey">Shared Key</label>
+                    </div>
+                    <div>
+                        <b class="T_weptype xxl">Key Format:</b>
+                        <input type="radio" name="keyFormat_5g" id="keyFormatAscii_5g" checked="checked" />
+                        <label>ASCII</label>
+                        <input type="radio" name="keyFormat_5g" id="keyFormatHex_5g" />
+                        <label class="T_hex">Hexadecimal</label>
+                    </div>
+                    <b class="T_wepkeyindex xxl">Key Index:</b>
+                    <select id="wepShareKey_5g" class="xl">
+                        <option value="1" id="key1_5g">Key 1</option>
+                        <option value="2" id="key2_5g">Key 2</option>
+                        <option value="3" id="key3_5g">key 3</option>
+                        <option value="4" id="key4_5g">Key 4</option>
+                    </select>
+                    <div>
+                        <b class="T_keyvalue xxl">Key Value:</b>
+                        <input type="text" class="tp-input-text xl" name="wepKeyValue_5g" id="wepKeyValue_5g" />
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="green T_save" id="wlAdvSave_5g">Save</button>
+        </form>
+        <br/>
+        <!-- NAT -->
+        <form class="pure-form pure-form-aligned">
+            <h3 id="et_nat">wireless 2.4ghz</h3>
+            <div>
+                <b id="t_nat" class="xxl">WDS Bridging:</b>
+                <input type="checkbox" id="enable_nat" />
+                <label id="t_ennat">Enable WDS Bridging</label>
+            </div>
+            <div class="nd">
+                <b id="t_hw_nat" class="xxl">WDS Bridging:</b>
+                <input type="checkbox" id="enable_hw_nat" />
+                <label id="t_en_hw_nat">Enable WDS Bridging</label>
+            </div>
+            <button type="submit" class="green T_save" id="natSave">Save</button>
+        </form>
+        <br/>
+
+        <!-- DDos parameters -->
+        <form class="pure-form pure-form-aligned">
+            <h3 id="et_ddos">wireless 2.4ghz</h3>
+            <table id="tblDos">
+                <tbody>
+                    <tr>
+                        <td class="notice">
+                            <label id="t_icmplevel" class="notice_lbl">ICMP-FLOOD Protection Level:</label>
+                        </td>
+                        <td class="value">
+
+                            <div id="icmpLow" class="inline">
+                                <b class="T_c_lowth">Low Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                            <div id="icmpMiddle" class="inline">
+                                <b class="T_c_midth">Middle Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                            <div id="icmpHigh" class="inline">
+                                <b class="T_c_higth">High Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="notice">
+                            <label id="t_udplevel" class="notice_lbl">UDP-FLOOD Protection Level:</label>
+                        </td>
+                        <td class="value">
+
+                            <div id="udpLow" class="inline">
+                                <b class="T_c_lowth">Low Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                            <div id="udpMiddle" class="inline">
+                                <b class="T_c_midth">Middle Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                            <div id="udpHigh" class="inline">
+                                <b class="T_c_higth">High Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="notice">
+                            <label id="t_tcplevel" class="notice_lbl">TCP-SYN-FLOOD Protection Level:</label>
+                        </td>
+                        <td class="value">
+
+                            <div id="tcpLow" class="inline">
+                                <b class="T_c_lowth">Low Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                            <div id="tcpMiddle" class="inline">
+                                <b class="T_c_midth">Middle Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                            <div id="tcpHigh" class="inline">
+                                <b class="T_c_higth">High Thresholds:</b> 
+                                <input type="text" class="s" value="" maxlength="4" required />
+                            </div>
+                            <div class="inline">
+                                <p class="T_c_unit">(5~3600) Packets/Secs</p>
+                            </div>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="submit" class="green T_save" id="ddosSave">Save</button>
+        </form>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript">
+$.tpInit(init);
+</script>
