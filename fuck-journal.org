@@ -1,0 +1,29 @@
+* PipeLine
+** Password
+HappyFuck12345678
+
+
+** My Router [50%] 
+- [X] syslog to me 
+- [ ] learn the ssh / telnet cli 
+  - [ ] get root access 
+  - [ ] change root passwd 
+ 
+
+
+
+** Other People's routers ... 
+*** other people's shit >;)  [%] 
+- [ ] phones? 
+- [ ] computers? 
+- [ ] vibrators? 
+
+* Notes 
+1. Hash cracking for $$ 
+
+2. Online Hash search engines (just hash an input, and then perform a search)... 
+2.1 this might be interesting to write a python script that scrapes a METRIC.SHIT.TON 
+of password lists, parses them, and routes your input through all of them. 
+2.1.1. graph db? (so as to interpolate hashes, regardless of algorithm?) 
+
+3. 
