@@ -3,16 +3,18 @@
 HappyFuck12345678
 
 
-** My Router [50%] 
+** My Router [100%] 
 - [X] syslog to me 
-- [ ] learn the ssh / telnet cli 
-  - [ ] get root access 
-  - [ ] change root passwd 
+- [X] learn the ssh / telnet cli 
+  - [X] get root access 
+  - [X] change root passwd 
  
-
-
-
 ** Other People's routers ... 
+*** Rquirements: [33%]  
+- [ ] 1. Kail/HackOS linux 
+- [ ] 2. Laptop with working wifi 
+- [X] 3  coffee  
+
 *** other people's shit >;)  [%] 
 - [ ] phones? 
 - [ ] computers? 
